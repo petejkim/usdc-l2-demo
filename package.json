@@ -1,0 +1,63 @@
+{
+  "name": "usdc-l2-demo",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "setup": "git config core.hooksPath .githooks",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom-fourteen",
+    "eject": "react-scripts eject",
+    "typecheck": "tsc -p . --noEmit",
+    "fmt": "prettier --write './**/*.{js,jsx,ts,tsx,json,md,css}'",
+    "lint": "eslint --ext '.js,.ts' './**/*.{j,t}s'",
+    "precommit": "yarn fmt && yarn typecheck && yarn lint"
+  },
+  "engines": {
+    "node": ">= 12.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "dependencies": {
+    "normalize.css": "^8.0.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.3",
+    "reflexbox": "^4.0.6",
+    "typescript": "~4.0.2",
+    "web3": "^1.2.11"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.0.2",
+    "@testing-library/user-event": "^12.1.4",
+    "@types/jest": "^26.0.13",
+    "@types/node": "^14.10.1",
+    "@types/react": "^16.9.49",
+    "@types/react-dom": "^16.9.8",
+    "@types/react-router-dom": "^5.1.5",
+    "@types/reflexbox": "^4.0.1",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-config-react-app": "^5.2.1",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "node-sass": "^4.14.1",
+    "prettier": "^2.1.1"
+  }
+}

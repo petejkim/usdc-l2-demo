@@ -1,0 +1,14 @@
+{
+  "files.exclude": {
+    "**/.DS_Store": true,
+    "**/node_modules/": true
+  },
+  "files.trimTrailingWhitespace": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.insertSpaces": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  }
+}
