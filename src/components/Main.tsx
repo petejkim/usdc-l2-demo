@@ -5,6 +5,7 @@ import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import "./Main.scss";
 import { Panel } from "./Panel";
+import { TabBar } from "./TabBar";
 
 export function Main(): JSX.Element {
   return (
@@ -35,6 +36,11 @@ export function Main(): JSX.Element {
           <Clock />
         </Box>
       </Flex>
+
+      <Box marginX={24}>
+        <TabBar activeLayer={2} />
+      </Box>
+
       <Flex
         justifyContent="space-evenly"
         flexWrap="wrap"
@@ -49,7 +55,7 @@ export function Main(): JSX.Element {
             <Panel title="Transfer USDC"></Panel>
           </Box>
           <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="Upload USDC to L2"></Panel>
+            <Panel title="Download USDC to L1"></Panel>
           </Box>
         </Flex>
         <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
@@ -60,9 +66,11 @@ export function Main(): JSX.Element {
           </Box>
         </Flex>
       </Flex>
+
       <Box flex={1} marginX={24} marginY={12}>
         <Panel title="Logs"></Panel>
       </Box>
+
       <Box marginX={24}>
         <Attribution />
       </Box>

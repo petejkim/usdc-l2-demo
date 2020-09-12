@@ -1,0 +1,53 @@
+@import "../variables";
+
+.TabBar {
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: $colorDark1;
+
+  ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid $colorDark3;
+    border-top-left-radius: 2px;
+    overflow: hidden;
+  }
+
+  li {
+    display: inline-block;
+    padding: 12px;
+    padding-left: 24px;
+    padding-right: 24px;
+    margin-right: -20px;
+
+    &.TabBar-active {
+      background: linear-gradient(
+        75deg,
+        transparent 0%,
+        transparent 8%,
+        $colorDark1 8.5%,
+        $colorDark1 92%,
+        transparent 92.5%,
+        transparent 100%
+      );
+      color: $bgColor;
+    }
+
+    &:first-of-type {
+      padding-left: 12px;
+
+      &.TabBar-active {
+        background: linear-gradient(
+          75deg,
+          $colorDark1 0%,
+          $colorDark1 92%,
+          transparent 92.5%,
+          transparent 100%
+        );
+      }
+    }
+  }
+}
