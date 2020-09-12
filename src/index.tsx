@@ -1,11 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Main } from "./components/Main";
 import "./index.scss";
 import * as serviceWorker from "./serviceWorker";
 
 ReactDOM.render(
   <React.StrictMode>
-    <div>Hello, world!</div>
+    <Main />
   </React.StrictMode>,
   document.getElementById("root")
 );

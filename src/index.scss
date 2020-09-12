@@ -1,1 +1,22 @@
 @import "~normalize.css/normalize.css";
+@import "./variables";
+
+html {
+  background-color: $bgColor;
+}
+
+body {
+  font-family: Barlow, sans-serif;
+  color: white;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+a {
+  color: $colorLight1;
+  text-decoration: none;
+}

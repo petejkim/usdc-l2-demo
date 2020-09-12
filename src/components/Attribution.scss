@@ -1,0 +1,31 @@
+@import "../variables";
+
+.Attribution {
+  text-align: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: $colorDark1;
+
+  ul {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    display: inline-block;
+    border-right: 1px solid $colorDark3;
+    padding-right: 8px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+
+    &:last-of-type {
+      border-right: none;
+      padding-right: 0;
+      margin-right: 0;
+    }
+  }
+}

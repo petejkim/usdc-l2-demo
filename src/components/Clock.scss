@@ -1,0 +1,20 @@
+@import "../variables";
+
+.Clock {
+  text-align: center;
+  color: $color1;
+
+  &-time {
+    font-family: "Nova Mono", monospace;
+    font-size: 40px;
+    color: $colorLight2;
+    text-shadow: 0 0 16px $colorDark2;
+  }
+
+  &-nosleep {
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+}

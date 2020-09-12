@@ -1,0 +1,7 @@
+$bgColor: rgb(5, 8, 13);
+$color1: rgb(156, 210, 220);
+$colorDark1: darken($color1, 10%);
+$colorDark2: darken($color1, 20%);
+$colorDark3: darken($color1, 40%);
+$colorLight1: lighten($color1, 5%);
+$colorLight2: lighten($color1, 20%);
