@@ -4,7 +4,10 @@ import { Box, Flex } from "reflexbox";
 import Web3 from "web3";
 import {
   L1_CONTRACT_ADDRESS,
+  L2_CHAIN_ID,
   L2_CONTRACT_ADDRESS,
+  L2_CONTRACT_NAME,
+  L2_CONTRACT_VERSION,
   L2_GAS_RELAY_URL,
   L2_JSON_RPC_URL,
 } from "../config";
@@ -23,6 +26,16 @@ import { WalletAddress } from "./WalletAddress";
 const L1_REFRESH_INTERVAL = 7000;
 const L2_REFRESH_INTERVAL = 1000;
 
+const L2_GAS_ABSTRACTION = {
+  relayUrl: L2_GAS_RELAY_URL,
+  eip712: {
+    useSalt: true,
+    name: L2_CONTRACT_NAME,
+    version: L2_CONTRACT_VERSION,
+    chainId: L2_CHAIN_ID,
+  },
+};
+
 const web3L2 = new Web3(new Web3.providers.HttpProvider(L2_JSON_RPC_URL));
 
 export function Main(): JSX.Element {
@@ -33,10 +46,10 @@ export function Main(): JSX.Element {
   const [balanceL2, setBalanceL2] = useState<BN | null>(null);
 
   const checkConnection = useCallback(
-    (address: string, provider: any): void => {
+    (address: string, ethereum: any): void => {
       if (address) {
         setUserAddress(address);
-        setWeb3(new Web3(provider));
+        setWeb3(new Web3(ethereum));
       }
     },
     []
@@ -144,7 +157,8 @@ export function Main(): JSX.Element {
                   contractAddress={L2_CONTRACT_ADDRESS}
                   balance={balanceL2}
                   decimalPlaces={6}
-                  gasRelayUrl={L2_GAS_RELAY_URL}
+                  gasAbstraction={L2_GAS_ABSTRACTION}
+                  signerWeb3={web3}
                 />
               )}
             </Panel>
