@@ -1,13 +1,26 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { Box, Flex } from "reflexbox";
+import Web3 from "web3";
 import { Attribution } from "./Attribution";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import "./Main.scss";
 import { Panel } from "./Panel";
+import { RequireWeb3 } from "./RequireWeb3";
 import { TabBar } from "./TabBar";
 
 export function Main(): JSX.Element {
+  const [web3, setWeb3] = useState<Web3 | null>(null);
+
+  const checkConnection = useCallback(
+    (address: string, provider: any): void => {
+      if (address) {
+        setWeb3(new Web3(provider));
+      }
+    },
+    [setWeb3]
+  );
+
   return (
     <Flex
       className="Main"
@@ -74,6 +87,8 @@ export function Main(): JSX.Element {
       <Box marginX={24}>
         <Attribution />
       </Box>
+
+      {!web3 && <RequireWeb3 onConnect={checkConnection} />}
     </Flex>
   );
 }
