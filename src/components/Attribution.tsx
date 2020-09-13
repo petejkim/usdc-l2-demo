@@ -1,12 +1,13 @@
 import React from "react";
+import ethereum from "../images/ethereum.svg";
 import "./Attribution.scss";
 
 export function Attribution(): JSX.Element {
   return (
     <div className="Attribution">
       <ul>
-        <li>
-          Designed and coded by{" "}
+        <li title="Wanna work together? Let me know.">
+          Designed and coded with <img src={ethereum} alt="♥" /> by{" "}
           <a href="https://twitter.com/petejkim">@petejkim</a> in California
         </li>
         <li>
