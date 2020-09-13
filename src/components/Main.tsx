@@ -5,6 +5,7 @@ import Web3 from "web3";
 import {
   L1_CONTRACT_ADDRESS,
   L2_CONTRACT_ADDRESS,
+  L2_GAS_RELAY_URL,
   L2_JSON_RPC_URL,
 } from "../config";
 import { Attribution } from "./Attribution";
@@ -16,6 +17,7 @@ import { Panel } from "./Panel";
 import { RequireWeb3 } from "./RequireWeb3";
 import { TabBar, TabId } from "./TabBar";
 import { TokenBalance } from "./TokenBalance";
+import { TransferToken } from "./TransferToken";
 import { WalletAddress } from "./WalletAddress";
 
 const L1_REFRESH_INTERVAL = 7000;
@@ -37,7 +39,7 @@ export function Main(): JSX.Element {
         setWeb3(new Web3(provider));
       }
     },
-    [setUserAddress, setWeb3]
+    []
   );
 
   const selectLayer = useCallback((tabId: TabId) => {
@@ -126,7 +128,26 @@ export function Main(): JSX.Element {
             </Panel>
           </Box>
           <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="Transfer USDC"></Panel>
+            <Panel title="Transfer USDC">
+              {activeLayer === 1 ? (
+                <TransferToken
+                  web3={web3}
+                  userAddress={userAddress}
+                  contractAddress={L1_CONTRACT_ADDRESS}
+                  balance={balanceL1}
+                  decimalPlaces={6}
+                />
+              ) : (
+                <TransferToken
+                  web3={web3L2}
+                  userAddress={userAddress}
+                  contractAddress={L2_CONTRACT_ADDRESS}
+                  balance={balanceL2}
+                  decimalPlaces={6}
+                  gasRelayUrl={L2_GAS_RELAY_URL}
+                />
+              )}
+            </Panel>
           </Box>
           <Box flex={1} marginY={12} minWidth="auto">
             <Panel

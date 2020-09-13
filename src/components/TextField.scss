@@ -1,0 +1,22 @@
+@import "../variables";
+
+.TextField {
+  appearance: none;
+  border: none;
+  border-bottom: 1px solid $colorDark3;
+  outline: none;
+  background-color: $bgColor;
+  color: $color1;
+  padding: 8px 4px;
+  font-size: 14px;
+  font-family: "Nova Mono", monospace;
+
+  &:focus {
+    border-color: $colorDark1;
+  }
+
+  &::placeholder {
+    font-family: Barlow, sans-serif;
+    color: $colorDark2;
+  }
+}

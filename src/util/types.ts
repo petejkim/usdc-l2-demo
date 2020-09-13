@@ -23,3 +23,23 @@ export function decimalStringFromBN(bn: BN, decimalPlaces = 0): string {
   }
   return str;
 }
+
+export function bnFromDecimalString(
+  decimalNumber: string,
+  decimalPlaces = 0
+): BN | null {
+  if (decimalNumber.startsWith("-")) {
+    return null;
+  }
+  if (!decimalNumber || !/^\d*(\.\d*)?$/.test(decimalNumber)) {
+    return null;
+  }
+
+  let [whole, fractional] = decimalNumber.split(".");
+  whole = whole || "0";
+  fractional = (fractional || "0")
+    .slice(0, decimalPlaces)
+    .padEnd(decimalPlaces, "0");
+
+  return new BN(whole + fractional, 10);
+}
