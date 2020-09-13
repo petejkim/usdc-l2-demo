@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
+import { useMediaQuery } from "react-responsive";
 import "./TabBar.scss";
 
 export type TabId = 1 | 2;
@@ -10,6 +11,9 @@ export interface TabBarProps {
 }
 
 export function TabBar(props: TabBarProps): JSX.Element {
+  const isSmallScreen = useMediaQuery({ query: "(max-width: 470px)" });
+  const layer = isSmallScreen ? "L" : "Layer ";
+
   const { selected, onSelect } = props;
   return (
     <div className="TabBar">
@@ -17,13 +21,13 @@ export function TabBar(props: TabBarProps): JSX.Element {
         <TabBarItem
           id={2}
           selected={selected}
-          label={"Layer 2 / Mumbai Testnet"}
+          label={`${layer}2 / Mumbai Testnet`}
           onSelect={onSelect}
         />
         <TabBarItem
           id={1}
           selected={selected}
-          label={"Layer 1 / Görli Testnet"}
+          label={`${layer}1 / Görli Testnet`}
           onSelect={onSelect}
         />
       </ul>

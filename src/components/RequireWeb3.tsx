@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from "react";
+import Web3 from "web3";
 import metaMaskLogo from "../images/metamask.svg";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
@@ -21,7 +22,7 @@ if (typeof window.ethereum?.autoRefreshOnNetworkChange === "boolean") {
 }
 
 export interface RequireWeb3Props {
-  onConnect?: (account: string, provider: any) => void;
+  onConnect?: (address: string, provider: any) => void;
 }
 
 export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
@@ -47,7 +48,8 @@ export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
       setChainId(netVer);
 
       if (netVer === 5) {
-        onConnect?.(accounts[0], window?.ethereum);
+        const address = Web3.utils.toChecksumAddress(accounts[0]);
+        onConnect?.(address, window?.ethereum);
       }
     });
   }, [onConnect]);

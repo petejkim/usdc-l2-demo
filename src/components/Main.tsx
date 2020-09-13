@@ -16,6 +16,7 @@ import { Panel } from "./Panel";
 import { RequireWeb3 } from "./RequireWeb3";
 import { TabBar, TabId } from "./TabBar";
 import { TokenBalance } from "./TokenBalance";
+import { WalletAddress } from "./WalletAddress";
 
 const L1_REFRESH_INTERVAL = 7000;
 const L2_REFRESH_INTERVAL = 1000;
@@ -68,9 +69,7 @@ export function Main(): JSX.Element {
       >
         <Box flex={1} margin={12} minWidth="auto">
           <Panel title="Wallet Address">
-            <code>
-              {userAddress || "0x0000000000000000000000000000000000000000"}
-            </code>
+            <WalletAddress address={userAddress} />
           </Panel>
         </Box>
         <Box flex={1} margin={12} minWidth="auto">

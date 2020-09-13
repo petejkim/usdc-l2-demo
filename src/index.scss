@@ -1,6 +1,10 @@
 @import "~normalize.css/normalize.css";
 @import "./variables";
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   background-color: $bgColor;
 }
