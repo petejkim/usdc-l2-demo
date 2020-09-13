@@ -5,7 +5,7 @@
   color: $color1;
 
   &-time {
-    font-family: "Nova Mono", monospace;
+    font-family: $monospace;
     font-size: 40px;
     color: $colorLight2;
     text-shadow: 0 0 16px $colorDark2;

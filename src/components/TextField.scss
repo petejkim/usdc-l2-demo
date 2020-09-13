@@ -9,14 +9,14 @@
   color: $color1;
   padding: 8px 4px;
   font-size: 14px;
-  font-family: "Nova Mono", monospace;
+  font-family: $monospace;
 
   &:focus {
     border-color: $colorDark1;
   }
 
   &::placeholder {
-    font-family: Barlow, sans-serif;
+    font-family: $sans;
     color: $colorDark2;
   }
 }
