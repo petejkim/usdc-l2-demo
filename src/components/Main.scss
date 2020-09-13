@@ -2,4 +2,19 @@
   height: 100%;
   padding-top: 12px;
   padding-bottom: 4px;
+
+  &-logs {
+    .Panel-contents {
+      padding: 0;
+    }
+
+    @media only screen and (min-width: 471px) {
+      overflow: hidden;
+      min-height: 128px;
+
+      .Panel-contents {
+        overflow: hidden;
+      }
+    }
+  }
 }

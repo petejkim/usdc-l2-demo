@@ -4,10 +4,12 @@ import { Box, Flex } from "reflexbox";
 import Web3 from "web3";
 import {
   L1_CONTRACT_ADDRESS,
+  L1_EXPLORER_URL,
   L2_CHAIN_ID,
   L2_CONTRACT_ADDRESS,
   L2_CONTRACT_NAME,
   L2_CONTRACT_VERSION,
+  L2_EXPLORER_URL,
   L2_GAS_RELAY_URL,
   L2_JSON_RPC_URL,
 } from "../config";
@@ -15,6 +17,7 @@ import { Attribution } from "./Attribution";
 import { BlockHeight } from "./BlockHeight";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
+import { Logs } from "./Logs";
 import "./Main.scss";
 import { Panel } from "./Panel";
 import { RequireWeb3 } from "./RequireWeb3";
@@ -144,14 +147,17 @@ export function Main(): JSX.Element {
             <Panel title="Transfer USDC">
               {activeLayer === 1 ? (
                 <TransferToken
+                  key={1}
                   web3={web3}
                   userAddress={userAddress}
                   contractAddress={L1_CONTRACT_ADDRESS}
                   balance={balanceL1}
                   decimalPlaces={6}
+                  explorerUrl={L1_EXPLORER_URL}
                 />
               ) : (
                 <TransferToken
+                  key={2}
                   web3={web3L2}
                   userAddress={userAddress}
                   contractAddress={L2_CONTRACT_ADDRESS}
@@ -159,6 +165,7 @@ export function Main(): JSX.Element {
                   decimalPlaces={6}
                   gasAbstraction={L2_GAS_ABSTRACTION}
                   signerWeb3={web3}
+                  explorerUrl={L2_EXPLORER_URL}
                 />
               )}
             </Panel>
@@ -180,8 +187,10 @@ export function Main(): JSX.Element {
         </Flex>
       </Flex>
 
-      <Box flex={1} marginX={24} marginY={12}>
-        <Panel title="Logs"></Panel>
+      <Box className="Main-logs" flex={1} marginX={24} marginY={12}>
+        <Panel title="Logs">
+          <Logs />
+        </Panel>
       </Box>
 
       <Box marginX={24}>

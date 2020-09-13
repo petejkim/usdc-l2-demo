@@ -2,7 +2,9 @@ import BN from "bn.js";
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
 import spinner from "../images/spinner.svg";
-import { retry } from "../util/retry";
+import { explorerTxHashUrl } from "../util/explorer";
+import { log } from "../util/logger";
+import { retry, ShortCircuitError } from "../util/retry";
 import { bnFromDecimalString, prepend0x, strip0x } from "../util/types";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
@@ -26,6 +28,7 @@ export interface TransferTokenProps {
     eip712: EIP712Options;
   };
   signerWeb3?: Web3 | null;
+  explorerUrl: string;
 }
 
 export interface EIP712Options {
@@ -44,6 +47,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
     decimalPlaces,
     gasAbstraction,
     signerWeb3,
+    explorerUrl,
   } = props;
 
   const [recipient, setRecipient] = useState<string>("");
@@ -69,27 +73,30 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
         gasRelayUrl: gasAbstraction.relayUrl,
         eip712: gasAbstraction.eip712,
         contractAddress,
-        signerWeb3: signerWeb3,
+        signerWeb3,
+        explorerUrl,
         setSigning,
         setSending,
       });
     } else {
-      performTransfer({
+      performDirectTransfer({
         from: userAddress,
         to: recipient,
         amount: parsedAmount,
         contractAddress,
         web3,
+        explorerUrl,
         setSigning,
         setSending,
       });
     }
   }, [
     web3,
-    signerWeb3,
     userAddress,
     contractAddress,
     gasAbstraction,
+    signerWeb3,
+    explorerUrl,
     parsedAmount,
     recipient,
   ]);
@@ -145,12 +152,13 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
   );
 }
 
-function performTransfer(options: {
+function performDirectTransfer(options: {
   from: string;
   to: string;
   amount: BN;
   contractAddress: string;
   web3: Web3;
+  explorerUrl: string;
   setSigning: (signing: boolean) => void;
   setSending: (sending: boolean) => void;
 }): void {
@@ -160,11 +168,13 @@ function performTransfer(options: {
     amount,
     contractAddress,
     web3,
+    explorerUrl,
     setSigning,
     setSending,
   } = options;
 
   setSigning(true);
+  log("Awaiting signature for direct transfer...");
 
   web3.eth
     .sendTransaction({
@@ -176,9 +186,26 @@ function performTransfer(options: {
           web3.eth.abi.encodeParameters(["address", "uint256"], [to, amount])
         ),
     })
-    .on("transactionHash", (_txHash) => {
+    .on("error", (err) => {
+      let errMsg: string;
+      if (err?.message.includes("denied")) {
+        errMsg = "User denied signature";
+      } else {
+        errMsg = appendError("Failed to submit transfer", err?.message);
+      }
+      log(errMsg, { error: true });
+    })
+    .on("transactionHash", (txHash) => {
       setSigning(false);
       setSending(true);
+      log(`Transaction submitted (${txHash}), awaiting confirmation...`, {
+        url: explorerTxHashUrl(explorerUrl, txHash),
+      });
+    })
+    .on("receipt", (receipt) => {
+      log("Transfer complete", {
+        url: explorerTxHashUrl(explorerUrl, receipt.transactionHash),
+      });
     })
     .finally(() => {
       setSigning(false);
@@ -194,6 +221,7 @@ function performGaslessTransfer(options: {
   eip712: EIP712Options;
   contractAddress: string;
   signerWeb3: Web3;
+  explorerUrl: string;
   setSigning: (signing: boolean) => void;
   setSending: (sending: boolean) => void;
 }): void {
@@ -205,11 +233,13 @@ function performGaslessTransfer(options: {
     eip712,
     contractAddress,
     signerWeb3,
+    explorerUrl,
     setSigning,
     setSending,
   } = options;
 
   setSigning(true);
+  log("Awaiting signature for transfer authorization...");
 
   const validAfter = UINT256_MIN;
   const validBefore = UINT256_MAX;
@@ -287,7 +317,17 @@ function performGaslessTransfer(options: {
     },
     (err, response) => {
       setSigning(false);
+
       if (err || !response?.result) {
+        let errMsg: string;
+        if (err?.message.includes("denied")) {
+          errMsg = "User denied signature";
+        } else if (err?.message.includes("eth_signTypedData")) {
+          errMsg = "EIP-712 is not supported by your Web3 browser";
+        } else {
+          errMsg = appendError("Failed to obtain signature", err?.message);
+        }
+        log(errMsg, { error: true });
         return;
       }
 
@@ -300,10 +340,17 @@ function performGaslessTransfer(options: {
         validBefore,
         nonce,
         response.result as string,
-        gasRelayUrl
-      ).finally(() => {
-        setSending(false);
-      });
+        gasRelayUrl,
+        explorerUrl
+      )
+        .catch((err) => {
+          log(err?.message || "Failed to submit transfer authorization", {
+            error: true,
+          });
+        })
+        .finally(() => {
+          setSending(false);
+        });
     }
   );
 }
@@ -316,7 +363,8 @@ async function submitAuthorization(
   validBefore: string,
   nonce: string,
   signature: string,
-  gasRelayUrl: string
+  gasRelayUrl: string,
+  explorerUrl: string
 ): Promise<void> {
   const payload = {
     type: "transfer",
@@ -331,66 +379,88 @@ async function submitAuthorization(
     s: prepend0x(signature.slice(66, 130)),
   };
 
-  const authorizationId = await retry(async () => {
-    const response = await fetch(`${gasRelayUrl}/authorizations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    const json = await response.json();
+  log("Transfer authorization signed, submitting to gas relayer...");
 
-    if (typeof json?.error === "string") {
-      throw new Error(json.error);
-    }
-    if (typeof json?.id !== "number") {
-      throw new Error("Failed to submit transfer authorization");
-    }
-
-    return json.id;
+  const response = await fetch(`${gasRelayUrl}/authorizations`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(payload),
   });
+  const json = await response.json();
 
-  await retry(async () => {
-    const response = await fetch(
-      `${gasRelayUrl}/authorizations/${authorizationId}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      }
+  if (typeof json?.id !== "number" || typeof json?.error === "string") {
+    throw new Error(
+      appendError("Failed to submit transfer authorization", json?.error)
     );
-    const json = await response.json();
+  }
 
-    if (typeof json?.error === "string") {
-      throw new Error(json.error);
-    }
-    if (typeof json?.tx_hash !== "string") {
-      throw new Error("Could not fetch transaction hash.");
-    }
+  const authorizationId = json.id;
 
-    return json.tx_hash;
-  });
+  log(
+    "Authorization submitted to gas relayer, awaiting transaction submission..."
+  );
 
-  await retry(async () => {
-    const response = await fetch(
-      `${gasRelayUrl}/authorizations/${authorizationId}`,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
+  const txHash = await retry(
+    async () => {
+      const response = await fetch(
+        `${gasRelayUrl}/authorizations/${authorizationId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      const json = await response.json();
+
+      if (json?.state === "failed" || typeof json?.error === "string") {
+        throw new ShortCircuitError(
+          appendError("Could not fetch transaction hash", json?.error)
+        );
       }
-    );
-    const json = await response.json();
+      if (json?.state === "pending" || typeof json?.tx_hash !== "string") {
+        throw new Error(appendError("Submission still pending", json?.error));
+      }
 
-    if (typeof json?.error === "string") {
-      throw new Error(json.error);
-    }
-    if (json?.state !== "confirmed") {
-      throw new Error("Could not get confirmation status.");
-    }
+      return json.tx_hash;
+    },
+    { interval: 500 }
+  );
+
+  log(`Transaction submitted (${txHash}), awaiting confirmation...`, {
+    url: explorerTxHashUrl(explorerUrl, txHash),
   });
+
+  await retry(
+    async () => {
+      const response = await fetch(
+        `${gasRelayUrl}/authorizations/${authorizationId}`,
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+          },
+        }
+      );
+      const json = await response.json();
+
+      if (json?.state !== "confirmed" || typeof json?.error === "string") {
+        throw new Error(
+          appendError("Could not get confirmation status", json?.error)
+        );
+      }
+    },
+    { interval: 500 }
+  );
+
+  log("Transfer complete", {
+    url: explorerTxHashUrl(explorerUrl, txHash),
+  });
+}
+
+function appendError(msg: string, errMsg?: string | null): string {
+  return errMsg ? `${msg}: ${errMsg}` : msg;
 }

@@ -43,3 +43,13 @@ export function bnFromDecimalString(
 
   return new BN(whole + fractional, 10);
 }
+
+export function formatTime(date: Date): string {
+  const [h, m, s] = [
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+  ].map((v) => v.toString().padStart(2, "0"));
+
+  return `${h}:${m}:${s}`;
+}
