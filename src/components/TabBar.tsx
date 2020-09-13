@@ -1,25 +1,56 @@
 import clsx from "clsx";
-import React from "react";
+import React, { useCallback } from "react";
 import "./TabBar.scss";
 
+export type TabId = 1 | 2;
+
 export interface TabBarProps {
-  activeLayer: 1 | 2;
+  selected: TabId;
+  onSelect?: (selected: TabId) => void;
 }
 
-const activeCls = "TabBar-active";
-
 export function TabBar(props: TabBarProps): JSX.Element {
-  const { activeLayer } = props;
+  const { selected, onSelect } = props;
   return (
     <div className="TabBar">
       <ul>
-        <li className={clsx(activeLayer === 2 && activeCls)}>
-          Layer 2 / Mumbai Testnet
-        </li>
-        <li className={clsx(activeLayer === 1 && activeCls)}>
-          Layer 1 / Görli Testnet
-        </li>
+        <TabBarItem
+          id={2}
+          selected={selected}
+          label={"Layer 2 / Mumbai Testnet"}
+          onSelect={onSelect}
+        />
+        <TabBarItem
+          id={1}
+          selected={selected}
+          label={"Layer 1 / Görli Testnet"}
+          onSelect={onSelect}
+        />
       </ul>
     </div>
+  );
+}
+
+function TabBarItem(props: {
+  id: TabId;
+  selected: TabId;
+  label: string;
+  onSelect?: (selected: TabId) => void;
+}): JSX.Element {
+  const { id, selected, label, onSelect } = props;
+
+  const onClick = useCallback(() => {
+    onSelect?.(id);
+  }, [id, onSelect]);
+
+  return (
+    <li>
+      <button
+        className={clsx(selected === id && "TabBar-active")}
+        onClick={onClick}
+      >
+        {label}
+      </button>
+    </li>
   );
 }

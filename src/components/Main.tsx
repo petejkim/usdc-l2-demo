@@ -9,13 +9,14 @@ import { Clock } from "./Clock";
 import "./Main.scss";
 import { Panel } from "./Panel";
 import { RequireWeb3 } from "./RequireWeb3";
-import { TabBar } from "./TabBar";
+import { TabBar, TabId } from "./TabBar";
 
 const web3L2 = new Web3(new Web3.providers.HttpProvider(L2_JSON_RPC_URL));
 
 export function Main(): JSX.Element {
   const [userAddress, setUserAddress] = useState<string>("");
   const [web3, setWeb3] = useState<Web3 | null>(null);
+  const [activeLayer, setActiveLayer] = useState<1 | 2>(2);
 
   const checkConnection = useCallback(
     (address: string, provider: any): void => {
@@ -26,6 +27,10 @@ export function Main(): JSX.Element {
     },
     [setUserAddress, setWeb3]
   );
+
+  const selectLayer = useCallback((tabId: TabId) => {
+    setActiveLayer(tabId);
+  }, []);
 
   return (
     <Flex
@@ -65,7 +70,7 @@ export function Main(): JSX.Element {
       </Flex>
 
       <Box marginX={24}>
-        <TabBar activeLayer={2} />
+        <TabBar selected={activeLayer} onSelect={selectLayer} />
       </Box>
 
       <Flex
@@ -82,7 +87,11 @@ export function Main(): JSX.Element {
             <Panel title="Transfer USDC"></Panel>
           </Box>
           <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="Download USDC to L1"></Panel>
+            <Panel
+              title={
+                activeLayer === 1 ? "Upload USDC to L2" : "Download USDC to L1"
+              }
+            ></Panel>
           </Box>
         </Flex>
         <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
