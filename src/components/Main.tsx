@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from "react";
 import { Box, Flex } from "reflexbox";
 import Web3 from "web3";
+import { L2_JSON_RPC_URL } from "../config";
 import { Attribution } from "./Attribution";
+import { BlockHeight } from "./BlockHeight";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import "./Main.scss";
@@ -9,16 +11,20 @@ import { Panel } from "./Panel";
 import { RequireWeb3 } from "./RequireWeb3";
 import { TabBar } from "./TabBar";
 
+const web3L2 = new Web3(new Web3.providers.HttpProvider(L2_JSON_RPC_URL));
+
 export function Main(): JSX.Element {
+  const [userAddress, setUserAddress] = useState<string>("");
   const [web3, setWeb3] = useState<Web3 | null>(null);
 
   const checkConnection = useCallback(
     (address: string, provider: any): void => {
       if (address) {
+        setUserAddress(address);
         setWeb3(new Web3(provider));
       }
     },
-    [setWeb3]
+    [setUserAddress, setWeb3]
   );
 
   return (
@@ -37,13 +43,21 @@ export function Main(): JSX.Element {
         marginY={0}
       >
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="Wallet Address"></Panel>
+          <Panel title="Wallet Address">
+            <code>
+              {userAddress || "0x0000000000000000000000000000000000000000"}
+            </code>
+          </Panel>
         </Box>
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="L1 / Görli Block Height"></Panel>
+          <Panel title="L1 / Görli Block Height">
+            <BlockHeight web3={web3} refreshInterval={7000} />
+          </Panel>
         </Box>
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="L2 / Mumbai Block Height"></Panel>
+          <Panel title="L2 / Mumbai Block Height">
+            <BlockHeight web3={web3L2} refreshInterval={1000} />
+          </Panel>
         </Box>
         <Box flexShrink={0} margin={12}>
           <Clock />
