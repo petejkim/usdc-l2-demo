@@ -2,23 +2,22 @@ import BN from "bn.js";
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
 import spinner from "../images/spinner.svg";
+import { Provider } from "../types/Provider";
+import { UINT256_MAX, UINT256_MIN } from "../util/constants";
+import { EIP712Options, makeEIP712Data } from "../util/eip712";
 import { explorerTxHashUrl } from "../util/explorer";
+import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
-import { retry, ShortCircuitError } from "../util/retry";
-import { bnFromDecimalString, prepend0x, strip0x } from "../util/types";
+import { appendError, bnFromDecimalString, strip0x } from "../util/types";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
 import { TextField } from "./TextField";
 import "./TransferToken.scss";
 
 const TRANSFER_SELECTOR = "0xa9059cbb";
-const UINT256_MIN =
-  "0x0000000000000000000000000000000000000000000000000000000000000000";
-const UINT256_MAX =
-  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
 
 export interface TransferTokenProps {
-  web3: Web3 | null;
+  signerWeb3: Web3 | null;
   userAddress: string;
   contractAddress: string;
   balance: BN | null;
@@ -27,26 +26,17 @@ export interface TransferTokenProps {
     relayUrl: string;
     eip712: EIP712Options;
   };
-  signerWeb3?: Web3 | null;
   explorerUrl: string;
-}
-
-export interface EIP712Options {
-  useSalt: boolean; // use salt field for chainId, for cross-chain signing
-  name: string;
-  version: string;
-  chainId: number;
 }
 
 export function TransferToken(props: TransferTokenProps): JSX.Element {
   const {
-    web3,
+    signerWeb3,
     userAddress,
     contractAddress,
     balance,
     decimalPlaces,
     gasAbstraction,
-    signerWeb3,
     explorerUrl,
   } = props;
 
@@ -62,40 +52,39 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
   const parsedAmount = bnFromDecimalString(amount, decimalPlaces);
 
   const sendTokens = useCallback(() => {
-    if (!web3 || !parsedAmount) {
+    if (!signerWeb3 || !parsedAmount) {
       return;
     }
     if (gasAbstraction && signerWeb3) {
       performGaslessTransfer({
+        signerWeb3,
         from: userAddress,
         to: recipient,
         amount: parsedAmount,
         gasRelayUrl: gasAbstraction.relayUrl,
         eip712: gasAbstraction.eip712,
         contractAddress,
-        signerWeb3,
         explorerUrl,
         setSigning,
         setSending,
       });
     } else {
       performDirectTransfer({
+        signerWeb3,
         from: userAddress,
         to: recipient,
         amount: parsedAmount,
         contractAddress,
-        web3,
         explorerUrl,
         setSigning,
         setSending,
       });
     }
   }, [
-    web3,
+    signerWeb3,
     userAddress,
     contractAddress,
     gasAbstraction,
-    signerWeb3,
     explorerUrl,
     parsedAmount,
     recipient,
@@ -153,21 +142,21 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
 }
 
 function performDirectTransfer(options: {
+  signerWeb3: Web3;
   from: string;
   to: string;
   amount: BN;
   contractAddress: string;
-  web3: Web3;
   explorerUrl: string;
-  setSigning: (signing: boolean) => void;
-  setSending: (sending: boolean) => void;
+  setSigning: (v: boolean) => void;
+  setSending: (v: boolean) => void;
 }): void {
   const {
+    signerWeb3,
     from,
     to,
     amount,
     contractAddress,
-    web3,
     explorerUrl,
     setSigning,
     setSending,
@@ -176,14 +165,17 @@ function performDirectTransfer(options: {
   setSigning(true);
   log("Awaiting signature for direct transfer...");
 
-  web3.eth
+  signerWeb3.eth
     .sendTransaction({
       from,
       to: contractAddress,
       data:
         TRANSFER_SELECTOR +
         strip0x(
-          web3.eth.abi.encodeParameters(["address", "uint256"], [to, amount])
+          signerWeb3.eth.abi.encodeParameters(
+            ["address", "uint256"],
+            [to, amount]
+          )
         ),
     })
     .on("error", (err) => {
@@ -214,25 +206,25 @@ function performDirectTransfer(options: {
 }
 
 function performGaslessTransfer(options: {
+  signerWeb3: Web3;
   from: string;
   to: string;
   amount: BN;
   gasRelayUrl: string;
   eip712: EIP712Options;
   contractAddress: string;
-  signerWeb3: Web3;
   explorerUrl: string;
-  setSigning: (signing: boolean) => void;
-  setSending: (sending: boolean) => void;
+  setSigning: (v: boolean) => void;
+  setSending: (v: boolean) => void;
 }): void {
   const {
+    signerWeb3,
     from,
     to,
     amount,
     gasRelayUrl,
     eip712,
     contractAddress,
-    signerWeb3,
     explorerUrl,
     setSigning,
     setSending,
@@ -243,23 +235,23 @@ function performGaslessTransfer(options: {
 
   const validAfter = UINT256_MIN;
   const validBefore = UINT256_MAX;
-  const nonce = signerWeb3.utils.randomHex(32);
+  const nonce = Web3.utils.randomHex(32);
 
-  const data = {
-    types: {
-      EIP712Domain: eip712.useSalt
-        ? [
-            { name: "name", type: "string" },
-            { name: "version", type: "string" },
-            { name: "verifyingContract", type: "address" },
-            { name: "salt", type: "bytes32" },
-          ]
-        : [
-            { name: "name", type: "string" },
-            { name: "version", type: "string" },
-            { name: "chainId", type: "uint256" },
-            { name: "verifyingContract", type: "address" },
-          ],
+  const eip712Data = makeEIP712Data(
+    eip712.useSalt
+      ? {
+          name: eip712.name,
+          version: eip712.version,
+          verifyingContract: contractAddress,
+          salt: eip712.chainId,
+        }
+      : {
+          name: eip712.name,
+          version: eip712.version,
+          chainId: eip712.chainId,
+          verifyingContract: contractAddress,
+        },
+    {
       TransferWithAuthorization: [
         { name: "from", type: "address" },
         { name: "to", type: "address" },
@@ -269,51 +261,25 @@ function performGaslessTransfer(options: {
         { name: "nonce", type: "bytes32" },
       ],
     },
-    domain: eip712.useSalt
-      ? {
-          name: eip712.name,
-          version: eip712.version,
-          verifyingContract: contractAddress,
-          salt: prepend0x(eip712.chainId.toString(16).padStart(64, "0")),
-        }
-      : {
-          name: eip712.name,
-          version: eip712.version,
-          chainId: eip712.chainId,
-          verifyingContract: contractAddress,
-        },
-    primaryType: "TransferWithAuthorization",
-    message: {
+    "TransferWithAuthorization",
+    {
       from,
       to,
       value: amount.toString(10),
       validAfter,
       validBefore,
       nonce,
-    },
-  };
+    }
+  );
 
-  const provider = signerWeb3.currentProvider as {
-    sendAsync: (
-      req: {
-        jsonrpc: "2.0";
-        id: number;
-        method: string;
-        params: any[];
-      },
-      callback: (
-        err: Error | null,
-        response: { result?: any; error?: any }
-      ) => void
-    ) => void;
-  };
+  const provider = signerWeb3.currentProvider as Provider;
 
   provider.sendAsync(
     {
       jsonrpc: "2.0",
       id: 1,
       method: "eth_signTypedData_v3",
-      params: [from, JSON.stringify(data)],
+      params: [from, eip712Data],
     },
     (err, response) => {
       setSigning(false);
@@ -330,19 +296,28 @@ function performGaslessTransfer(options: {
         log(errMsg, { error: true });
         return;
       }
+      const signature = response.result as string;
 
       setSending(true);
-      submitAuthorization(
-        from,
-        to,
-        amount,
+      log("Transfer authorization signed, submitting to gas relayer...");
+
+      submitAuthorization({
+        type: "transfer",
+        address1: from,
+        address2: to,
+        value: amount,
         validAfter,
         validBefore,
         nonce,
-        response.result as string,
+        signature,
         gasRelayUrl,
-        explorerUrl
-      )
+        explorerUrl,
+      })
+        .then((txHash) => {
+          log("Transfer complete", {
+            url: explorerTxHashUrl(explorerUrl, txHash),
+          });
+        })
         .catch((err) => {
           log(err?.message || "Failed to submit transfer authorization", {
             error: true,
@@ -353,114 +328,4 @@ function performGaslessTransfer(options: {
         });
     }
   );
-}
-
-async function submitAuthorization(
-  from: string,
-  to: string,
-  amount: BN,
-  validAfter: string,
-  validBefore: string,
-  nonce: string,
-  signature: string,
-  gasRelayUrl: string,
-  explorerUrl: string
-): Promise<void> {
-  const payload = {
-    type: "transfer",
-    address1: from,
-    address2: to,
-    value: prepend0x(amount.toString(16)),
-    valid_after: validAfter,
-    valid_before: validBefore,
-    nonce,
-    v: prepend0x(signature.slice(130, 132)),
-    r: signature.slice(2, 66),
-    s: prepend0x(signature.slice(66, 130)),
-  };
-
-  log("Transfer authorization signed, submitting to gas relayer...");
-
-  const response = await fetch(`${gasRelayUrl}/authorizations`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
-  const json = await response.json();
-
-  if (typeof json?.id !== "number" || typeof json?.error === "string") {
-    throw new Error(
-      appendError("Failed to submit transfer authorization", json?.error)
-    );
-  }
-
-  const authorizationId = json.id;
-
-  log(
-    "Authorization submitted to gas relayer, awaiting transaction submission..."
-  );
-
-  const txHash = await retry(
-    async () => {
-      const response = await fetch(
-        `${gasRelayUrl}/authorizations/${authorizationId}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-      const json = await response.json();
-
-      if (json?.state === "failed" || typeof json?.error === "string") {
-        throw new ShortCircuitError(
-          appendError("Could not fetch transaction hash", json?.error)
-        );
-      }
-      if (json?.state === "pending" || typeof json?.tx_hash !== "string") {
-        throw new Error(appendError("Submission still pending", json?.error));
-      }
-
-      return json.tx_hash;
-    },
-    { interval: 500 }
-  );
-
-  log(`Transaction submitted (${txHash}), awaiting confirmation...`, {
-    url: explorerTxHashUrl(explorerUrl, txHash),
-  });
-
-  await retry(
-    async () => {
-      const response = await fetch(
-        `${gasRelayUrl}/authorizations/${authorizationId}`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-      const json = await response.json();
-
-      if (json?.state !== "confirmed" || typeof json?.error === "string") {
-        throw new Error(
-          appendError("Could not get confirmation status", json?.error)
-        );
-      }
-    },
-    { interval: 500 }
-  );
-
-  log("Transfer complete", {
-    url: explorerTxHashUrl(explorerUrl, txHash),
-  });
-}
-
-function appendError(msg: string, errMsg?: string | null): string {
-  return errMsg ? `${msg}: ${errMsg}` : msg;
 }

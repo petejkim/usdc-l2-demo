@@ -1,18 +1,7 @@
-.TransferToken {
-  &-recipient-field {
-    position: relative;
-    margin-bottom: 8px;
-
-    .TextField {
-      width: 100%;
-    }
-  }
-
-  &-second-row {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-  }
+.Burn {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 
   &-amount-field {
     position: relative;

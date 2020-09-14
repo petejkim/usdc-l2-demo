@@ -53,3 +53,7 @@ export function formatTime(date: Date): string {
 
   return `${h}:${m}:${s}`;
 }
+
+export function appendError(msg: string, errMsg?: string | null): string {
+  return errMsg ? `${msg}: ${errMsg}` : msg;
+}

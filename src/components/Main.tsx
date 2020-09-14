@@ -15,6 +15,7 @@ import {
 } from "../config";
 import { Attribution } from "./Attribution";
 import { BlockHeight } from "./BlockHeight";
+import { Burn } from "./Burn";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import { Logs } from "./Logs";
@@ -148,7 +149,7 @@ export function Main(): JSX.Element {
               {activeLayer === 1 ? (
                 <TransferToken
                   key={1}
-                  web3={web3}
+                  signerWeb3={web3}
                   userAddress={userAddress}
                   contractAddress={L1_CONTRACT_ADDRESS}
                   balance={balanceL1}
@@ -158,13 +159,12 @@ export function Main(): JSX.Element {
               ) : (
                 <TransferToken
                   key={2}
-                  web3={web3L2}
+                  signerWeb3={web3}
                   userAddress={userAddress}
                   contractAddress={L2_CONTRACT_ADDRESS}
                   balance={balanceL2}
                   decimalPlaces={6}
                   gasAbstraction={L2_GAS_ABSTRACTION}
-                  signerWeb3={web3}
                   explorerUrl={L2_EXPLORER_URL}
                 />
               )}
@@ -173,9 +173,23 @@ export function Main(): JSX.Element {
           <Box flex={1} marginY={12} minWidth="auto">
             <Panel
               title={
-                activeLayer === 1 ? "Upload USDC to L2" : "Download USDC to L1"
+                activeLayer === 1
+                  ? "Move USDC to Layer 2 (Deposit)"
+                  : "Move USDC to Layer 1 (Burn)"
               }
-            ></Panel>
+            >
+              {activeLayer === 2 && (
+                <Burn
+                  signerWeb3={web3}
+                  userAddress={userAddress}
+                  contractAddress={L2_CONTRACT_ADDRESS}
+                  balance={balanceL2}
+                  decimalPlaces={6}
+                  gasAbstraction={L2_GAS_ABSTRACTION}
+                  explorerUrl={L2_EXPLORER_URL}
+                />
+              )}
+            </Panel>
           </Box>
         </Flex>
         <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
