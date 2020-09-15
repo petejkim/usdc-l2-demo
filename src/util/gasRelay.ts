@@ -15,7 +15,7 @@ export async function submitAuthorization(params: {
   signature: string;
   gasRelayUrl: string;
   explorerUrl: string;
-}): Promise<string> {
+}): Promise<{ txHash: string; blockNumber: number }> {
   const { gasRelayUrl, explorerUrl } = params;
 
   const payload = {
@@ -82,7 +82,7 @@ export async function submitAuthorization(params: {
     url: explorerTxHashUrl(explorerUrl, txHash),
   });
 
-  await retry(
+  const blockNumber: number = await retry(
     async () => {
       const response = await fetch(
         `${gasRelayUrl}/authorizations/${authorizationId}`,
@@ -100,9 +100,11 @@ export async function submitAuthorization(params: {
           appendError("Could not get confirmation status", json?.error)
         );
       }
+
+      return json.confirmed_block;
     },
     { interval: 500 }
   );
 
-  return txHash;
+  return { txHash, blockNumber };
 }

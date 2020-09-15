@@ -15,7 +15,6 @@ import {
 } from "../config";
 import { Attribution } from "./Attribution";
 import { BlockHeight } from "./BlockHeight";
-import { Burn } from "./Burn";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import { Logs } from "./Logs";
@@ -26,6 +25,7 @@ import { TabBar, TabId } from "./TabBar";
 import { TokenBalance } from "./TokenBalance";
 import { TransferToken } from "./TransferToken";
 import { WalletAddress } from "./WalletAddress";
+import { Withdraw } from "./Withdraw";
 
 const L1_REFRESH_INTERVAL = 7000;
 const L2_REFRESH_INTERVAL = 1000;
@@ -174,12 +174,12 @@ export function Main(): JSX.Element {
             <Panel
               title={
                 activeLayer === 1
-                  ? "Move USDC to Layer 2 (Deposit)"
-                  : "Move USDC to Layer 1 (Burn)"
+                  ? "Deposit USDC to Layer 2"
+                  : "Withdraw USDC to Layer 1"
               }
             >
               {activeLayer === 2 && (
-                <Burn
+                <Withdraw
                   signerWeb3={web3}
                   userAddress={userAddress}
                   contractAddress={L2_CONTRACT_ADDRESS}

@@ -9,12 +9,14 @@ import { explorerTxHashUrl } from "../util/explorer";
 import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
 import { appendError, bnFromDecimalString } from "../util/types";
-import "./Burn.scss";
+import { addBurnTx } from "../util/withdrawal";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
+import { Modal } from "./Modal";
 import { TextField } from "./TextField";
+import "./Withdraw.scss";
 
-export interface BurnProps {
+export interface WithdrawProps {
   signerWeb3: Web3 | null;
   userAddress: string;
   contractAddress: string;
@@ -27,7 +29,7 @@ export interface BurnProps {
   explorerUrl: string;
 }
 
-export function Burn(props: BurnProps): JSX.Element {
+export function Withdraw(props: WithdrawProps): JSX.Element {
   const {
     signerWeb3,
     userAddress,
@@ -39,6 +41,7 @@ export function Burn(props: BurnProps): JSX.Element {
   } = props;
 
   const [amount, setAmount] = useState<string>("");
+  const [showModal, setShowModal] = useState<boolean>(false);
   const [signing, setSigning] = useState<boolean>(false);
   const [burning, setBurning] = useState<boolean>(false);
 
@@ -48,7 +51,16 @@ export function Burn(props: BurnProps): JSX.Element {
 
   const parsedAmount = bnFromDecimalString(amount, decimalPlaces);
 
-  const burnTokens = useCallback(() => {
+  const clickWithdraw = useCallback(() => {
+    setShowModal(true);
+  }, []);
+
+  const clickCancel = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const clickProceed = useCallback(() => {
+    setShowModal(false);
     if (!signerWeb3 || !parsedAmount) {
       return;
     }
@@ -79,27 +91,49 @@ export function Burn(props: BurnProps): JSX.Element {
     !amount || !amountValid || amountTooBig || signing || burning;
 
   return (
-    <div className="Burn">
-      <div className="Burn-amount-field">
-        <TextField
-          value={amount}
-          placeholder="Amount (12.34)"
-          onChange={changeAmount}
-        />
-        {amount && !amountValid && (
-          <HintBubble>Amount entered is invalid.</HintBubble>
-        )}
-        {amount && amountTooBig && (
-          <HintBubble>
-            Amount entered is greater than current balance.
-          </HintBubble>
-        )}
+    <>
+      <div className="Withdraw">
+        <div className="Withdraw-amount-field">
+          <TextField
+            value={amount}
+            placeholder="Amount (12.34)"
+            onChange={changeAmount}
+          />
+          {amount && !amountValid && (
+            <HintBubble>Amount entered is invalid.</HintBubble>
+          )}
+          {amount && amountTooBig && (
+            <HintBubble>
+              Amount entered is greater than current balance.
+            </HintBubble>
+          )}
+        </div>
+        {burning && <img className="Withdraw-spinner" src={spinner} alt="" />}
+        <Button disabled={disableBurn} onClick={clickWithdraw}>
+          {signing ? "Confirming..." : burning ? "Burning..." : "Withdraw"}
+        </Button>
       </div>
-      {burning && <img className="Burn-spinner" src={spinner} alt="" />}
-      <Button disabled={disableBurn} onClick={burnTokens}>
-        {signing ? "Confirming..." : burning ? "Burning..." : "Burn"}
-      </Button>
-    </div>
+
+      {showModal && (
+        <Modal className="Withdraw-modal" title="Be Advised">
+          <p>Withdrawing USDC from L2 to L1 is a two-step process.</p>
+          <span className="Withdraw-step">1</span>
+          <p>In L2, the USDC tokens you'd like to withdraw are burned.</p>
+          <p>
+            Every ~30 minutes, a checkpoint containing the latest snapshot of
+            the L2 chain state is submitted to L1.
+          </p>
+          <span className="Withdraw-step">2</span>
+          <p>
+            In L1, once the checkpoint is available, a merkle proof of the burn
+            transaction can be submitted to claim the tokens.
+          </p>
+
+          <Button onClick={clickCancel}>Cancel</Button>
+          <Button onClick={clickProceed}>Proceed with Burn</Button>
+        </Modal>
+      )}
+    </>
   );
 }
 
@@ -200,10 +234,11 @@ function performBurn(options: {
         gasRelayUrl,
         explorerUrl,
       })
-        .then((txHash) => {
+        .then(({ txHash, blockNumber }) => {
+          addBurnTx(txHash, blockNumber);
           log(
-            "Burn complete. You can claim burned tokens in Layer 1 after the next " +
-              "checkpoint is committed in ~30 minutes.",
+            `Burn confirmed at ${blockNumber}. You can claim burned tokens in` +
+              " Layer 1 after the next checkpoint is committed in ~30 minutes.",
             { url: explorerTxHashUrl(explorerUrl, txHash) }
           );
         })

@@ -3,7 +3,7 @@ import Web3 from "web3";
 import metaMaskLogo from "../images/metamask.svg";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
-import { Panel } from "./Panel";
+import { Modal } from "./Modal";
 import "./RequireWeb3.scss";
 
 declare global {
@@ -55,26 +55,19 @@ export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
   }, [onConnect]);
 
   return (
-    <div className="RequireWeb3">
-      <div className="RequireWeb3-backdrop" />
-      <div className="RequireWeb3-container">
-        <Panel title="Be Advised">
-          <img src={metaMaskLogo} alt="" />
+    <Modal className="RequireWeb3" title="Be Advised">
+      <img src={metaMaskLogo} alt="" />
 
-          <p>
-            To run this demo, please use a Web3-enabled browser connected to the
-            Görli (Goerli) Test Network.
-          </p>
+      <p>
+        To run this demo, please use a Web3-enabled browser connected to the
+        Görli (Goerli) Test Network.
+      </p>
 
-          <Button onClick={connect}>Connect</Button>
+      <Button onClick={connect}>Connect</Button>
 
-          {chainId != null && chainId !== 5 && (
-            <HintBubble>
-              Please switch to Görli Testnet and try again.
-            </HintBubble>
-          )}
-        </Panel>
-      </div>
-    </div>
+      {chainId != null && chainId !== 5 && (
+        <HintBubble>Please switch to Görli Testnet and try again.</HintBubble>
+      )}
+    </Modal>
   );
 }

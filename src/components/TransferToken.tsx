@@ -313,7 +313,7 @@ function performGaslessTransfer(options: {
         gasRelayUrl,
         explorerUrl,
       })
-        .then((txHash) => {
+        .then(({ txHash }) => {
           log("Transfer complete", {
             url: explorerTxHashUrl(explorerUrl, txHash),
           });

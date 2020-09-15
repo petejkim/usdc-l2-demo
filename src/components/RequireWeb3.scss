@@ -1,36 +1,7 @@
 @import "../variables";
 
 .RequireWeb3 {
-  &-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-  }
-
-  &-container {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .Panel {
-    max-width: 500px;
-    margin: 32px;
-    height: auto;
-    box-shadow: 0 0 16px $colorDark3;
-  }
-
   .Panel-contents {
-    position: relative;
     text-align: center;
     padding: 16px;
 
