@@ -12,7 +12,7 @@ export interface TabBarProps {
 
 export function TabBar(props: TabBarProps): JSX.Element {
   const isSmallScreen = useMediaQuery({
-    query: "only screen and (max-width: 470px)",
+    query: "(max-width: 470px)",
   });
   const layer = isSmallScreen ? "L" : "Layer ";
 

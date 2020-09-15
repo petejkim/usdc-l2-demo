@@ -25,6 +25,7 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
     initialBalance,
     onChange,
   } = props;
+
   const [balance, setBalance] = useState<string>(
     initialBalance ? decimalStringFromBN(initialBalance, decimalPlaces) : "N/A"
   );

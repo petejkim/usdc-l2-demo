@@ -5,10 +5,11 @@ export interface ButtonProps {
   children?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
+  title?: string;
 }
 
 export function Button(props: ButtonProps): JSX.Element {
-  const { children, onClick, disabled } = props;
+  const { children, onClick, disabled, title } = props;
 
   const click = useCallback(
     (evt: React.MouseEvent) => {
@@ -19,7 +20,12 @@ export function Button(props: ButtonProps): JSX.Element {
   );
 
   return (
-    <button className="Button" onClick={click} disabled={disabled}>
+    <button
+      className="Button"
+      onClick={click}
+      disabled={disabled}
+      title={title}
+    >
       {children}
     </button>
   );

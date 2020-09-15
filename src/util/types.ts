@@ -57,3 +57,11 @@ export function formatTime(date: Date): string {
 export function appendError(msg: string, errMsg?: string | null): string {
   return errMsg ? `${msg}: ${errMsg}` : msg;
 }
+
+export function abbreviateHex(hex: string): string {
+  const h = prepend0x(hex);
+  if (h.length <= 10) {
+    return h;
+  }
+  return `${h.slice(0, 6)}⋯${h.slice(-4)}`;
+}

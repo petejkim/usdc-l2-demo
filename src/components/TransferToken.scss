@@ -23,14 +23,9 @@
     }
   }
 
-  .Button {
+  .Button,
+  .Spinner {
     margin-left: 8px;
     flex-shrink: 0;
-  }
-
-  &-spinner {
-    width: 24px;
-    height: 24px;
-    margin-left: 8px;
   }
 }

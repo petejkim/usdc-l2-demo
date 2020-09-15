@@ -1,7 +1,6 @@
 import BN from "bn.js";
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
-import spinner from "../images/spinner.svg";
 import { Provider } from "../types/Provider";
 import { UINT256_MAX, UINT256_MIN, ZERO_ADDRESS } from "../util/constants";
 import { EIP712Options, makeEIP712Data } from "../util/eip712";
@@ -9,10 +8,11 @@ import { explorerTxHashUrl } from "../util/explorer";
 import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
 import { appendError, bnFromDecimalString } from "../util/types";
-import { addBurnTx } from "../util/withdrawal";
+import { addBurn } from "../util/withdrawal";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
 import { Modal } from "./Modal";
+import { Spinner } from "./Spinner";
 import { TextField } from "./TextField";
 import "./Withdraw.scss";
 
@@ -108,7 +108,7 @@ export function Withdraw(props: WithdrawProps): JSX.Element {
             </HintBubble>
           )}
         </div>
-        {burning && <img className="Withdraw-spinner" src={spinner} alt="" />}
+        {burning && <Spinner />}
         <Button disabled={disableBurn} onClick={clickWithdraw}>
           {signing ? "Confirming..." : burning ? "Burning..." : "Withdraw"}
         </Button>
@@ -235,7 +235,7 @@ function performBurn(options: {
         explorerUrl,
       })
         .then(({ txHash, blockNumber }) => {
-          addBurnTx(txHash, blockNumber);
+          addBurn(txHash, blockNumber, amount);
           log(
             `Burn confirmed at ${blockNumber}. You can claim burned tokens in` +
               " Layer 1 after the next checkpoint is committed in ~30 minutes.",

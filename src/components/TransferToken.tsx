@@ -1,7 +1,6 @@
 import BN from "bn.js";
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
-import spinner from "../images/spinner.svg";
 import { Provider } from "../types/Provider";
 import { UINT256_MAX, UINT256_MIN } from "../util/constants";
 import { EIP712Options, makeEIP712Data } from "../util/eip712";
@@ -11,6 +10,7 @@ import { log } from "../util/logger";
 import { appendError, bnFromDecimalString, strip0x } from "../util/types";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
+import { Spinner } from "./Spinner";
 import { TextField } from "./TextField";
 import "./TransferToken.scss";
 
@@ -130,9 +130,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
             </HintBubble>
           )}
         </div>
-        {sending && (
-          <img className="TransferToken-spinner" src={spinner} alt="" />
-        )}
+        {sending && <Spinner />}
         <Button disabled={disableSend} onClick={sendTokens}>
           {signing ? "Confirming..." : sending ? "Sending..." : "Send"}
         </Button>

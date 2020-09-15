@@ -3,6 +3,12 @@
   padding-top: 12px;
   padding-bottom: 4px;
 
+  &-mid-panels {
+    @media only screen and (max-width: 640px) {
+      flex-direction: column;
+    }
+  }
+
   &-logs {
     .Panel-contents {
       padding: 0;
@@ -14,6 +20,22 @@
 
       .Panel-contents {
         overflow: hidden;
+      }
+    }
+  }
+
+  &-withdrawals {
+    .Panel-contents {
+      padding: 0;
+    }
+
+    @media only screen and (min-width: 641px) {
+      overflow: hidden;
+      min-height: 128px;
+
+      .Panel-contents {
+        overflow: hidden;
+        height: 0;
       }
     }
   }

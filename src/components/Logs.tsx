@@ -1,19 +1,12 @@
 import clsx from "clsx";
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useLayoutEffect, useRef } from "react";
 import * as logger from "../util/logger";
 import { formatTime } from "../util/types";
+import { useRerender } from "../util/useRerender";
 import "./Logs.scss";
 
 export function Logs(): JSX.Element {
-  const [i, setI] = useState(0);
-  const rerender = useCallback(() => setI(i + 1), [i]);
-
+  const [i, rerender] = useRerender();
   const divRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {

@@ -3,20 +3,24 @@ import React, { useCallback, useState } from "react";
 import { Box, Flex } from "reflexbox";
 import Web3 from "web3";
 import {
-  L1_CONTRACT_ADDRESS,
   L1_EXPLORER_URL,
+  L1_POS_ROOT_CHAIN_MANAGER_CONTRACT,
+  L1_ROOT_CHAIN_CONTRACT,
+  L1_TOKEN_CONTRACT,
   L2_CHAIN_ID,
-  L2_CONTRACT_ADDRESS,
   L2_CONTRACT_NAME,
   L2_CONTRACT_VERSION,
   L2_EXPLORER_URL,
   L2_GAS_RELAY_URL,
   L2_JSON_RPC_URL,
+  L2_TOKEN_CONTRACT,
 } from "../config";
 import { Attribution } from "./Attribution";
 import { BlockHeight } from "./BlockHeight";
+import { ClaimWithdrawal } from "./ClaimWithdrawal";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
+import { LastCheckpoint } from "./LastCheckpoint";
 import { Logs } from "./Logs";
 import "./Main.scss";
 import { Panel } from "./Panel";
@@ -29,6 +33,7 @@ import { Withdraw } from "./Withdraw";
 
 const L1_REFRESH_INTERVAL = 7000;
 const L2_REFRESH_INTERVAL = 1000;
+const CHECKPOINT_REFRESH_INTERVAL = 60000;
 
 const L2_GAS_ABSTRACTION = {
   relayUrl: L2_GAS_RELAY_URL,
@@ -40,6 +45,8 @@ const L2_GAS_ABSTRACTION = {
   },
 };
 
+const DECIMAL_PLACES = 6;
+
 const web3L2 = new Web3(new Web3.providers.HttpProvider(L2_JSON_RPC_URL));
 
 export function Main(): JSX.Element {
@@ -48,6 +55,7 @@ export function Main(): JSX.Element {
   const [activeLayer, setActiveLayer] = useState<1 | 2>(2);
   const [balanceL1, setBalanceL1] = useState<BN | null>(null);
   const [balanceL2, setBalanceL2] = useState<BN | null>(null);
+  const [checkpoint, setCheckpoint] = useState<number>(0);
 
   const checkConnection = useCallback(
     (address: string, ethereum: any): void => {
@@ -69,6 +77,10 @@ export function Main(): JSX.Element {
 
   const balanceL2Change = useCallback((balance: BN) => {
     setBalanceL2(balance);
+  }, []);
+
+  const checkpointChange = useCallback((checkpoint: number) => {
+    setCheckpoint(checkpoint);
   }, []);
 
   return (
@@ -111,92 +123,132 @@ export function Main(): JSX.Element {
       </Box>
 
       <Flex
+        className="Main-mid-panels"
         justifyContent="space-evenly"
         flexWrap="wrap"
         marginX={12}
         marginY={0}
       >
-        <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
-          <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="USDC Balance">
-              {activeLayer === 1 ? (
+        {activeLayer === 1 ? (
+          <Flex
+            key={1}
+            flex={1}
+            marginX={12}
+            flexDirection="column"
+            minWidth="auto"
+          >
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="USDC Balance">
                 <TokenBalance
-                  key={1}
                   web3={web3}
                   userAddress={userAddress}
-                  contractAddress={L1_CONTRACT_ADDRESS}
-                  decimalPlaces={6}
+                  contractAddress={L1_TOKEN_CONTRACT}
+                  decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L1_REFRESH_INTERVAL}
                   initialBalance={balanceL1}
                   onChange={balanceL1Change}
                 />
-              ) : (
+              </Panel>
+            </Box>
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="Transfer USDC">
+                <TransferToken
+                  signerWeb3={web3}
+                  userAddress={userAddress}
+                  contractAddress={L1_TOKEN_CONTRACT}
+                  balance={balanceL1}
+                  decimalPlaces={DECIMAL_PLACES}
+                  explorerUrl={L1_EXPLORER_URL}
+                />
+              </Panel>
+            </Box>
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="Deposit USDC to Layer 2" />
+            </Box>
+          </Flex>
+        ) : (
+          <Flex
+            key={2}
+            flex={1}
+            marginX={12}
+            flexDirection="column"
+            minWidth="auto"
+          >
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="USDC Balance">
                 <TokenBalance
-                  key={2}
                   web3={web3L2}
                   userAddress={userAddress}
-                  contractAddress={L2_CONTRACT_ADDRESS}
-                  decimalPlaces={6}
+                  contractAddress={L2_TOKEN_CONTRACT}
+                  decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L2_REFRESH_INTERVAL}
                   initialBalance={balanceL2}
                   onChange={balanceL2Change}
                 />
-              )}
-            </Panel>
-          </Box>
-          <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="Transfer USDC">
-              {activeLayer === 1 ? (
+              </Panel>
+            </Box>
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="Transfer USDC">
                 <TransferToken
-                  key={1}
                   signerWeb3={web3}
                   userAddress={userAddress}
-                  contractAddress={L1_CONTRACT_ADDRESS}
-                  balance={balanceL1}
-                  decimalPlaces={6}
-                  explorerUrl={L1_EXPLORER_URL}
-                />
-              ) : (
-                <TransferToken
-                  key={2}
-                  signerWeb3={web3}
-                  userAddress={userAddress}
-                  contractAddress={L2_CONTRACT_ADDRESS}
+                  contractAddress={L2_TOKEN_CONTRACT}
                   balance={balanceL2}
-                  decimalPlaces={6}
+                  decimalPlaces={DECIMAL_PLACES}
                   gasAbstraction={L2_GAS_ABSTRACTION}
                   explorerUrl={L2_EXPLORER_URL}
                 />
-              )}
-            </Panel>
-          </Box>
-          <Box flex={1} marginY={12} minWidth="auto">
-            <Panel
-              title={
-                activeLayer === 1
-                  ? "Deposit USDC to Layer 2"
-                  : "Withdraw USDC to Layer 1"
-              }
-            >
-              {activeLayer === 2 && (
+              </Panel>
+            </Box>
+            <Box flex={1} marginY={12} minWidth="auto">
+              <Panel title="Withdraw USDC to Layer 1">
                 <Withdraw
                   signerWeb3={web3}
                   userAddress={userAddress}
-                  contractAddress={L2_CONTRACT_ADDRESS}
+                  contractAddress={L2_TOKEN_CONTRACT}
                   balance={balanceL2}
-                  decimalPlaces={6}
+                  decimalPlaces={DECIMAL_PLACES}
                   gasAbstraction={L2_GAS_ABSTRACTION}
                   explorerUrl={L2_EXPLORER_URL}
                 />
-              )}
-            </Panel>
-          </Box>
-        </Flex>
+              </Panel>
+            </Box>
+          </Flex>
+        )}
         <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
-          <Box flex={1} marginY={12} minWidth="auto">
-            <Panel title="Cliché Visualization">
-              <ClicheVisualization />
-            </Panel>
+          {activeLayer === 1 && (
+            <Box flexShrink={0} marginY={12} minWidth="auto">
+              <Panel title="Last Checkpoint">
+                <LastCheckpoint
+                  web3={web3}
+                  rootChain={L1_ROOT_CHAIN_CONTRACT}
+                  refreshInterval={CHECKPOINT_REFRESH_INTERVAL}
+                  initialCheckpoint={checkpoint}
+                  onChange={checkpointChange}
+                />
+              </Panel>
+            </Box>
+          )}
+          <Box className="Main-withdrawals" flexGrow={1} marginY={12}>
+            {activeLayer === 1 ? (
+              <Panel title="Claim Withdrawals">
+                <ClaimWithdrawal
+                  web3={web3}
+                  web3L2={web3L2}
+                  userAddress={userAddress}
+                  rootChain={L1_ROOT_CHAIN_CONTRACT}
+                  posRootChainManager={L1_POS_ROOT_CHAIN_MANAGER_CONTRACT}
+                  decimalPlaces={DECIMAL_PLACES}
+                  explorerUrl={L1_EXPLORER_URL}
+                  explorerUrlL2={L2_EXPLORER_URL}
+                  checkpoint={checkpoint}
+                />
+              </Panel>
+            ) : (
+              <Panel title="Cliché Visualization">
+                <ClicheVisualization />
+              </Panel>
+            )}
           </Box>
         </Flex>
       </Flex>
