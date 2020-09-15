@@ -30,6 +30,8 @@
     ]
   },
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "3.10.1",
+    "@typescript-eslint/parser": "3.10.1",
     "clsx": "^1.1.1",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
