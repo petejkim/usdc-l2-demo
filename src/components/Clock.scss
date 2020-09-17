@@ -3,6 +3,8 @@
 .Clock {
   text-align: center;
   color: $color1;
+  user-select: none;
+  cursor: pointer;
 
   &-time {
     font-family: $monospace;
