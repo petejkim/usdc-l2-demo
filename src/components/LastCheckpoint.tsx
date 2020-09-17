@@ -32,14 +32,16 @@ export function LastCheckpoint(props: LastCheckpointProps): JSX.Element {
         return;
       }
 
-      void getLastChildBlock(web3, rootChain).then((b) => {
-        if (aborted) {
-          return;
-        }
-        timer = window.setTimeout(loadLastChildBlock, refreshInterval);
-        setCheckpoint(String(b));
-        onChange(b);
-      });
+      void getLastChildBlock(web3, rootChain)
+        .then((b) => {
+          setCheckpoint(String(b));
+          onChange(b);
+        })
+        .finally(() => {
+          if (!aborted) {
+            timer = window.setTimeout(loadLastChildBlock, refreshInterval);
+          }
+        });
     };
 
     loadLastChildBlock();

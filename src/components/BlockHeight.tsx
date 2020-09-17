@@ -15,13 +15,16 @@ export function BlockHeight(props: BlockHeightProps): JSX.Element {
     let aborted = false;
 
     const loadBlockHeight = (): void => {
-      void web3?.eth.getBlockNumber().then((v) => {
-        if (aborted) {
-          return;
-        }
-        setBlockHeight(v);
-        timer = window.setTimeout(loadBlockHeight, refreshInterval);
-      });
+      void web3?.eth
+        .getBlockNumber()
+        .then((v) => {
+          setBlockHeight(v);
+        })
+        .finally(() => {
+          if (!aborted) {
+            timer = window.setTimeout(loadBlockHeight, refreshInterval);
+          }
+        });
     };
 
     loadBlockHeight();

@@ -2,6 +2,7 @@ import BN from "bn.js";
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
 import { UINT256_MAX } from "../util/constants";
+import { BALANCE_SHOULD_UPDATE_EVENT, events } from "../util/events";
 import { explorerTxHashUrl } from "../util/explorer";
 import { log } from "../util/logger";
 import {
@@ -258,6 +259,7 @@ async function performDeposit(params: {
         );
       })
       .on("receipt", (receipt) => {
+        events.emit(BALANCE_SHOULD_UPDATE_EVENT);
         log(
           `Deposit confirmed at ${receipt.blockNumber}. The deposited funds ` +
             "will be made available in L2 in approximately 5 to 8 minutes.",

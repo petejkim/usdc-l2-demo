@@ -4,6 +4,7 @@ import Web3 from "web3";
 import { Provider } from "../types/Provider";
 import { UINT256_MAX, UINT256_MIN, ZERO_ADDRESS } from "../util/constants";
 import { EIP712Options, makeEIP712Data } from "../util/eip712";
+import { BALANCE_SHOULD_UPDATE_EVENT, events } from "../util/events";
 import { explorerTxHashUrl } from "../util/explorer";
 import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
@@ -236,6 +237,7 @@ function performBurn(options: {
       })
         .then(({ txHash, blockNumber }) => {
           addBurn(txHash, blockNumber, amount);
+          events.emit(BALANCE_SHOULD_UPDATE_EVENT);
           log(
             `Burn confirmed at ${blockNumber}. You can claim burned tokens in` +
               " Layer 1 after the next checkpoint is committed in ~30 minutes.",

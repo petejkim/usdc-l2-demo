@@ -4,6 +4,7 @@ import Web3 from "web3";
 import { Provider } from "../types/Provider";
 import { UINT256_MAX, UINT256_MIN } from "../util/constants";
 import { EIP712Options, makeEIP712Data } from "../util/eip712";
+import { BALANCE_SHOULD_UPDATE_EVENT, events } from "../util/events";
 import { explorerTxHashUrl } from "../util/explorer";
 import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
@@ -61,53 +62,59 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [state, setState] = useState<ClaimState>(ClaimState.DEFAULT);
 
+  const reloadBalance = useCallback(async () => {
+    if (!web3 || !userAddress) {
+      return;
+    }
+
+    const data =
+      BALANCE_OF_SELECTOR +
+      strip0x(web3.eth.abi.encodeParameters(["address"], [userAddress]));
+
+    const balanceHex = await web3.eth.call(
+      {
+        from: userAddress,
+        to: tokenContract,
+        data,
+      },
+      "latest"
+    );
+    const balanceBN = web3.utils.toBN(balanceHex);
+    setBalance(decimalStringFromBN(balanceBN, decimalPlaces));
+    onChange(balanceBN);
+  }, [web3, userAddress, tokenContract, decimalPlaces, onChange]);
+
   useEffect(() => {
     let timer: number;
     let aborted = false;
 
-    const loadTokenBalance = (): void => {
-      if (!web3 || !userAddress) {
-        return;
-      }
+    const loadTokenBalance = async (): Promise<void> => {
+      window.clearTimeout(timer);
 
-      const data =
-        BALANCE_OF_SELECTOR +
-        strip0x(web3.eth.abi.encodeParameters(["address"], [userAddress]));
-
-      void web3.eth
-        .call(
-          {
-            from: userAddress,
-            to: tokenContract,
-            data,
-          },
-          "latest"
-        )
-        .then((v) => {
-          if (aborted) {
-            return;
-          }
+      try {
+        await reloadBalance();
+      } finally {
+        if (!aborted) {
           timer = window.setTimeout(loadTokenBalance, refreshInterval);
-          const balanceBN = web3.utils.toBN(v);
-          setBalance(decimalStringFromBN(balanceBN, decimalPlaces));
-          onChange(balanceBN);
-        });
+        }
+      }
     };
 
-    loadTokenBalance();
+    void loadTokenBalance();
 
     return (): void => {
       aborted = true;
       window.clearTimeout(timer);
     };
-  }, [
-    web3,
-    userAddress,
-    tokenContract,
-    decimalPlaces,
-    refreshInterval,
-    onChange,
-  ]);
+  }, [reloadBalance, refreshInterval]);
+
+  useEffect(() => {
+    void reloadBalance();
+    events.on(BALANCE_SHOULD_UPDATE_EVENT, reloadBalance);
+    return (): void => {
+      events.off(BALANCE_SHOULD_UPDATE_EVENT, reloadBalance);
+    };
+  }, [reloadBalance]);
 
   const clickGiveMe = useCallback(() => {
     if (!web3) {
@@ -227,6 +234,7 @@ async function performClaim(params: {
         );
       })
       .on("receipt", (receipt) => {
+        events.emit(BALANCE_SHOULD_UPDATE_EVENT);
         log("Received USDC tokens from the faucet contract.", {
           url: explorerTxHashUrl(explorerUrl, receipt.transactionHash),
         });
@@ -354,6 +362,7 @@ async function performGaslessClaim(params: {
         explorerUrl,
       })
         .then(({ txHash }) => {
+          events.emit(BALANCE_SHOULD_UPDATE_EVENT);
           log("Received USDC tokens from the faucet contract.", {
             url: explorerTxHashUrl(explorerUrl, txHash),
           });
