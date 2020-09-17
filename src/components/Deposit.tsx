@@ -34,6 +34,7 @@ export interface DepositProps {
   userAddress: string;
   tokenContract: string;
   posRootChainManager: string;
+  posERC20Predicate: string;
   balance: BN | null;
   decimalPlaces: number;
   explorerUrl: string;
@@ -45,6 +46,7 @@ export function Deposit(props: DepositProps): JSX.Element {
     userAddress,
     tokenContract,
     posRootChainManager,
+    posERC20Predicate,
     balance,
     decimalPlaces,
     explorerUrl,
@@ -79,6 +81,7 @@ export function Deposit(props: DepositProps): JSX.Element {
       tokenContract,
       amount: parsedAmount,
       posRootChainManager,
+      posERC20Predicate,
       explorerUrl,
       setState,
     });
@@ -87,6 +90,7 @@ export function Deposit(props: DepositProps): JSX.Element {
     userAddress,
     tokenContract,
     posRootChainManager,
+    posERC20Predicate,
     explorerUrl,
     parsedAmount,
   ]);
@@ -148,6 +152,7 @@ async function performDeposit(params: {
   tokenContract: string;
   amount: BN;
   posRootChainManager: string;
+  posERC20Predicate: string;
   explorerUrl: string;
   setState: (state: DepositState) => void;
 }): Promise<void> {
@@ -157,6 +162,7 @@ async function performDeposit(params: {
     tokenContract,
     amount,
     posRootChainManager,
+    posERC20Predicate,
     explorerUrl,
     setState,
   } = params;
@@ -168,7 +174,7 @@ async function performDeposit(params: {
     strip0x(
       web3.eth.abi.encodeParameters(
         ["address", "address"],
-        [owner, posRootChainManager]
+        [owner, posERC20Predicate]
       )
     );
 
@@ -192,7 +198,7 @@ async function performDeposit(params: {
       strip0x(
         web3.eth.abi.encodeParameters(
           ["address", "uint256"],
-          [posRootChainManager, UINT256_MAX]
+          [posERC20Predicate, UINT256_MAX]
         )
       );
 

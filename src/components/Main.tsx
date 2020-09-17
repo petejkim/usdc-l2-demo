@@ -4,6 +4,7 @@ import { Box, Flex } from "reflexbox";
 import Web3 from "web3";
 import {
   L1_EXPLORER_URL,
+  L1_POS_ERC20_PREDICATE_CONTRACT,
   L1_POS_ROOT_CHAIN_MANAGER_CONTRACT,
   L1_ROOT_CHAIN_CONTRACT,
   L1_TOKEN_CONTRACT,
@@ -185,6 +186,7 @@ export function Main(): JSX.Element {
                   userAddress={userAddress}
                   tokenContract={L1_TOKEN_CONTRACT}
                   posRootChainManager={L1_POS_ROOT_CHAIN_MANAGER_CONTRACT}
+                  posERC20Predicate={L1_POS_ERC20_PREDICATE_CONTRACT}
                   balance={balanceL1}
                   decimalPlaces={DECIMAL_PLACES}
                   explorerUrl={L1_EXPLORER_URL}
