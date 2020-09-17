@@ -1,7 +1,11 @@
 import BN from "bn.js";
 import React, { useCallback, useEffect, useState } from "react";
 import Web3 from "web3";
+import { Provider } from "../types/Provider";
+import { UINT256_MAX, UINT256_MIN } from "../util/constants";
+import { EIP712Options, makeEIP712Data } from "../util/eip712";
 import { explorerTxHashUrl } from "../util/explorer";
+import { submitAuthorization } from "../util/gasRelay";
 import { log } from "../util/logger";
 import { appendError, decimalStringFromBN, strip0x } from "../util/types";
 import { Button } from "./Button";
@@ -21,12 +25,17 @@ enum ClaimState {
 
 export interface TokenBalanceProps {
   web3: Web3 | null;
+  signerWeb3: Web3 | null;
   userAddress: string;
   tokenContract: string;
-  tokenFaucet: string;
+  tokenFaucet?: string;
   decimalPlaces: number;
   refreshInterval: number;
   initialBalance: BN | null;
+  gasAbstraction?: {
+    relayUrl: string;
+    eip712: EIP712Options;
+  };
   explorerUrl: string;
   onChange: (balance: BN) => void;
 }
@@ -34,12 +43,14 @@ export interface TokenBalanceProps {
 export function TokenBalance(props: TokenBalanceProps): JSX.Element {
   const {
     web3,
+    signerWeb3,
     userAddress,
     tokenContract,
     tokenFaucet,
     decimalPlaces,
     refreshInterval,
     initialBalance,
+    gasAbstraction,
     explorerUrl,
     onChange,
   } = props;
@@ -102,27 +113,54 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
     if (!web3) {
       return;
     }
-    void performClaim({
-      web3,
-      userAddress,
-      tokenFaucet,
-      explorerUrl,
-      setShowModal,
-      setState,
-    });
-  }, [web3, userAddress, tokenFaucet, explorerUrl]);
+
+    if (tokenFaucet) {
+      void performClaim({
+        web3,
+        userAddress,
+        tokenFaucet,
+        explorerUrl,
+        setShowModal,
+        setState,
+      });
+    }
+
+    if (signerWeb3 && gasAbstraction) {
+      void performGaslessClaim({
+        web3,
+        signerWeb3,
+        userAddress,
+        tokenContract,
+        gasRelayUrl: gasAbstraction.relayUrl,
+        eip712: gasAbstraction.eip712,
+        explorerUrl,
+        setShowModal,
+        setState,
+      });
+    }
+  }, [
+    web3,
+    signerWeb3,
+    userAddress,
+    tokenFaucet,
+    tokenContract,
+    gasAbstraction,
+    explorerUrl,
+  ]);
 
   const clickUnderstood = useCallback(() => {
     setShowModal(false);
   }, []);
+
+  const giveMeDisabled = state !== ClaimState.DEFAULT;
 
   return (
     <>
       <div className="TokenBalance">
         <code>{balance}</code>
         {state === ClaimState.CLAIMING && <Spinner small />}
-        {tokenFaucet && (
-          <Button small onClick={clickGiveMe}>
+        {(tokenFaucet || gasAbstraction) && (
+          <Button small onClick={clickGiveMe} disabled={giveMeDisabled}>
             {state === ClaimState.CLAIMING
               ? "Claiming..."
               : state === ClaimState.SIGNING
@@ -164,19 +202,7 @@ async function performClaim(params: {
 
   setState(ClaimState.SIGNING);
 
-  const canClaimCallData =
-    CAN_CLAIM_SELECTOR +
-    strip0x(web3.eth.abi.encodeParameters(["address"], [userAddress]));
-
-  const canClaimHex = await web3.eth.call(
-    {
-      from: userAddress,
-      to: tokenFaucet,
-      data: canClaimCallData,
-    },
-    "latest"
-  );
-  const canClaim = canClaimHex.slice(-1) === "1";
+  const canClaim = await checkCanClaim(web3, userAddress, tokenFaucet);
 
   if (!canClaim) {
     setState(ClaimState.DEFAULT);
@@ -219,4 +245,148 @@ async function performClaim(params: {
   } finally {
     setState(ClaimState.DEFAULT);
   }
+}
+
+async function performGaslessClaim(params: {
+  web3: Web3;
+  signerWeb3: Web3;
+  userAddress: string;
+  tokenContract: string;
+  gasRelayUrl: string;
+  eip712: EIP712Options;
+  explorerUrl: string;
+  setShowModal: (v: boolean) => void;
+  setState: (v: ClaimState) => void;
+}): Promise<void> {
+  const {
+    web3,
+    signerWeb3,
+    userAddress,
+    tokenContract,
+    gasRelayUrl,
+    eip712,
+    explorerUrl,
+    setShowModal,
+    setState,
+  } = params;
+
+  setState(ClaimState.SIGNING);
+
+  const canClaim = await checkCanClaim(web3, userAddress, tokenContract);
+
+  if (!canClaim) {
+    setState(ClaimState.DEFAULT);
+    setShowModal(true);
+    return;
+  }
+
+  log(
+    "Requesting your signature to obtain tokens from the faucet contract gaslessly..."
+  );
+
+  const validAfter = UINT256_MIN;
+  const validBefore = UINT256_MAX;
+  const nonce = Web3.utils.randomHex(32);
+
+  const eip712Data = makeEIP712Data(
+    {
+      name: eip712.name,
+      version: eip712.version,
+      verifyingContract: tokenContract,
+      salt: eip712.chainId,
+    },
+    {
+      ClaimWithAuthorization: [
+        { name: "owner", type: "address" },
+        { name: "validAfter", type: "uint256" },
+        { name: "validBefore", type: "uint256" },
+        { name: "nonce", type: "bytes32" },
+      ],
+    },
+    "ClaimWithAuthorization",
+    {
+      owner: userAddress,
+      validAfter,
+      validBefore,
+      nonce,
+    }
+  );
+
+  const provider = signerWeb3.currentProvider as Provider;
+
+  provider.sendAsync(
+    {
+      jsonrpc: "2.0",
+      id: 1,
+      method: "eth_signTypedData_v3",
+      params: [userAddress, eip712Data],
+    },
+    (err, response) => {
+      setState(ClaimState.DEFAULT);
+
+      if (err || !response?.result) {
+        let errMsg: string;
+        if (err?.message.includes("denied")) {
+          errMsg = "User denied signature";
+        } else if (err?.message.includes("eth_signTypedData")) {
+          errMsg = "EIP-712 is not supported by your Web3 browser";
+        } else {
+          errMsg = appendError("Failed to obtain signature", err?.message);
+        }
+        log(errMsg, { error: true });
+        return;
+      }
+      const signature = response.result as string;
+
+      setState(ClaimState.CLAIMING);
+      log("Claim authorization signed, submitting to gas relayer...");
+
+      submitAuthorization({
+        type: "claim",
+        address1: userAddress,
+        address2: userAddress,
+        value: new BN(0),
+        validAfter,
+        validBefore,
+        nonce,
+        signature,
+        gasRelayUrl,
+        explorerUrl,
+      })
+        .then(({ txHash }) => {
+          log("Received USDC tokens from the faucet contract.", {
+            url: explorerTxHashUrl(explorerUrl, txHash),
+          });
+        })
+        .catch((err) => {
+          log(err?.message || "Failed to submit claim authorization", {
+            error: true,
+          });
+        })
+        .finally(() => {
+          setState(ClaimState.DEFAULT);
+        });
+    }
+  );
+}
+
+async function checkCanClaim(
+  web3: Web3,
+  userAddress: string,
+  contract: string
+): Promise<boolean> {
+  const canClaimCallData =
+    CAN_CLAIM_SELECTOR +
+    strip0x(web3.eth.abi.encodeParameters(["address"], [userAddress]));
+
+  const canClaimHex = await web3.eth.call(
+    {
+      from: userAddress,
+      to: contract,
+      data: canClaimCallData,
+    },
+    "latest"
+  );
+
+  return canClaimHex.slice(-1) === "1";
 }

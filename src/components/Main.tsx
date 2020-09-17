@@ -150,6 +150,7 @@ export function Main(): JSX.Element {
               <Panel title="L1 USDC Balance">
                 <TokenBalance
                   web3={web3}
+                  signerWeb3={null}
                   userAddress={userAddress}
                   tokenContract={L1_TOKEN_CONTRACT}
                   tokenFaucet={L1_TOKEN_FAUCET}
@@ -199,12 +200,14 @@ export function Main(): JSX.Element {
               <Panel title="L2 USDC Balance">
                 <TokenBalance
                   web3={web3L2}
+                  signerWeb3={web3}
                   userAddress={userAddress}
                   tokenContract={L2_TOKEN_CONTRACT}
                   tokenFaucet={""}
                   decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L2_REFRESH_INTERVAL}
                   initialBalance={balanceL2}
+                  gasAbstraction={L2_GAS_ABSTRACTION}
                   explorerUrl={L2_EXPLORER_URL}
                   onChange={balanceL2Change}
                 />
