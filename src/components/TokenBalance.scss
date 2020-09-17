@@ -1,0 +1,13 @@
+.TokenBalance {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  code {
+    flex-grow: 1;
+  }
+
+  .Spinner {
+    margin: 0 6px;
+  }
+}

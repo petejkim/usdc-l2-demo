@@ -7,6 +7,7 @@ import {
   L1_POS_ROOT_CHAIN_MANAGER_CONTRACT,
   L1_ROOT_CHAIN_CONTRACT,
   L1_TOKEN_CONTRACT,
+  L1_TOKEN_FAUCET,
   L2_CHAIN_ID,
   L2_CONTRACT_NAME,
   L2_CONTRACT_VERSION,
@@ -151,9 +152,11 @@ export function Main(): JSX.Element {
                   web3={web3}
                   userAddress={userAddress}
                   tokenContract={L1_TOKEN_CONTRACT}
+                  tokenFaucet={L1_TOKEN_FAUCET}
                   decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L1_REFRESH_INTERVAL}
                   initialBalance={balanceL1}
+                  explorerUrl={L1_EXPLORER_URL}
                   onChange={balanceL1Change}
                 />
               </Panel>
@@ -198,9 +201,11 @@ export function Main(): JSX.Element {
                   web3={web3L2}
                   userAddress={userAddress}
                   tokenContract={L2_TOKEN_CONTRACT}
+                  tokenFaucet={""}
                   decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L2_REFRESH_INTERVAL}
                   initialBalance={balanceL2}
+                  explorerUrl={L2_EXPLORER_URL}
                   onChange={balanceL2Change}
                 />
               </Panel>
