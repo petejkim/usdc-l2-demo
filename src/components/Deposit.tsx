@@ -130,7 +130,8 @@ export function Deposit(props: DepositProps): JSX.Element {
         <Modal className="Deposit-modal" title="Be Advised">
           <p>
             After your deposit transaction is confirmed in L1, your token
-            balance in L2 will be updated in about 5 to 8 minutes.
+            balance in L2 will be updated in about 5 to 8 minutes, once the
+            validators in the L2 PoS consensus layer confirm your deposit.
           </p>
           <Button onClick={clickCancel}>Cancel</Button>
           <Button onClick={clickProceed}>Proceed with Deposit</Button>

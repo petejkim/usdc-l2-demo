@@ -39,4 +39,14 @@
       }
     }
   }
+
+  &-visualization {
+    @media only screen and (max-width: 640px) {
+      flex-direction: column;
+
+      .ClicheVisualization .tsparticles-canvas-el {
+        height: 128px !important;
+      }
+    }
+  }
 }

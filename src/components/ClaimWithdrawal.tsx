@@ -177,9 +177,9 @@ export function Withdrawal(props: WithdrawalProps): JSX.Element {
       </td>
       <td className="Withdrawal-claim">
         {(state === WithdrawalState.GETTING_DATA ||
-          state === WithdrawalState.CLAIMING) && <Spinner />}
+          state === WithdrawalState.CLAIMING) && <Spinner small />}
         {burnTx.blockNumber <= checkpoint ? (
-          <Button onClick={claim} disabled={claimDisabled}>
+          <Button small onClick={claim} disabled={claimDisabled}>
             {state === WithdrawalState.GETTING_DATA
               ? "Loading..."
               : state === WithdrawalState.SIGNING
@@ -189,7 +189,7 @@ export function Withdrawal(props: WithdrawalProps): JSX.Element {
               : "Claim"}
           </Button>
         ) : (
-          <Button title="Awaiting checkpoint..." disabled>
+          <Button small title="Awaiting checkpoint..." disabled>
             Pending
           </Button>
         )}
@@ -209,12 +209,12 @@ async function performExit(
   setState: (state: WithdrawalState) => void
 ): Promise<void> {
   setState(WithdrawalState.GETTING_DATA);
-  log(`Generating merkle proof for the burn transaction ${burnTxHash}...`);
+  log(`Generating a merkle proof for the burn transaction ${burnTxHash}...`);
 
   const data = await getDataForExit(burnTxHash, web3, web3L2, rootChain);
 
   setState(WithdrawalState.SIGNING);
-  log("Awaiting signature to claim withdrawal...");
+  log("Requesting your signature to claim a withdrawal...");
 
   web3.eth
     .sendTransaction({
@@ -230,7 +230,7 @@ async function performExit(
         errMsg = "User denied signature";
       } else {
         errMsg = appendError(
-          "Failed to submit claim transaction",
+          "Failed to submit a claim transaction",
           err?.message
         );
       }

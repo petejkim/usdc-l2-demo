@@ -1,6 +1,8 @@
 @import "../variables";
 
 .Button {
+  display: inline-block;
+  appearance: none;
   background-color: $color1;
   color: $bgColor;
   border: none;
@@ -13,6 +15,13 @@
   letter-spacing: 0.5px;
   transition: 0.1s background-color, 0.1s box-shadow;
   cursor: pointer;
+
+  &-small {
+    height: 24px;
+    font-size: 12px;
+    line-height: 24px;
+    padding: 0 8px;
+  }
 
   &:focus {
     box-shadow: 0 0 5px $colorDark1;

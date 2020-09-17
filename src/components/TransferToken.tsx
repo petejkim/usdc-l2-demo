@@ -19,7 +19,7 @@ const TRANSFER_SELECTOR = "0xa9059cbb";
 export interface TransferTokenProps {
   signerWeb3: Web3 | null;
   userAddress: string;
-  contractAddress: string;
+  tokenContract: string;
   balance: BN | null;
   decimalPlaces: number;
   gasAbstraction?: {
@@ -33,7 +33,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
   const {
     signerWeb3,
     userAddress,
-    contractAddress,
+    tokenContract,
     balance,
     decimalPlaces,
     gasAbstraction,
@@ -63,7 +63,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
         amount: parsedAmount,
         gasRelayUrl: gasAbstraction.relayUrl,
         eip712: gasAbstraction.eip712,
-        contractAddress,
+        tokenContract,
         explorerUrl,
         setSigning,
         setSending,
@@ -74,7 +74,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
         from: userAddress,
         to: recipient,
         amount: parsedAmount,
-        contractAddress,
+        tokenContract,
         explorerUrl,
         setSigning,
         setSending,
@@ -83,7 +83,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
   }, [
     signerWeb3,
     userAddress,
-    contractAddress,
+    tokenContract,
     gasAbstraction,
     explorerUrl,
     parsedAmount,
@@ -144,7 +144,7 @@ function performDirectTransfer(options: {
   from: string;
   to: string;
   amount: BN;
-  contractAddress: string;
+  tokenContract: string;
   explorerUrl: string;
   setSigning: (v: boolean) => void;
   setSending: (v: boolean) => void;
@@ -154,19 +154,19 @@ function performDirectTransfer(options: {
     from,
     to,
     amount,
-    contractAddress,
+    tokenContract,
     explorerUrl,
     setSigning,
     setSending,
   } = options;
 
   setSigning(true);
-  log("Awaiting signature for direct transfer...");
+  log("Requesting your signature to transfer USDC...");
 
   signerWeb3.eth
     .sendTransaction({
       from,
-      to: contractAddress,
+      to: tokenContract,
       data:
         TRANSFER_SELECTOR +
         strip0x(
@@ -210,7 +210,7 @@ function performGaslessTransfer(options: {
   amount: BN;
   gasRelayUrl: string;
   eip712: EIP712Options;
-  contractAddress: string;
+  tokenContract: string;
   explorerUrl: string;
   setSigning: (v: boolean) => void;
   setSending: (v: boolean) => void;
@@ -222,14 +222,14 @@ function performGaslessTransfer(options: {
     amount,
     gasRelayUrl,
     eip712,
-    contractAddress,
+    tokenContract,
     explorerUrl,
     setSigning,
     setSending,
   } = options;
 
   setSigning(true);
-  log("Awaiting signature for transfer authorization...");
+  log("Requesting your signature to authorize a gasless transfer...");
 
   const validAfter = UINT256_MIN;
   const validBefore = UINT256_MAX;
@@ -240,14 +240,14 @@ function performGaslessTransfer(options: {
       ? {
           name: eip712.name,
           version: eip712.version,
-          verifyingContract: contractAddress,
+          verifyingContract: tokenContract,
           salt: eip712.chainId,
         }
       : {
           name: eip712.name,
           version: eip712.version,
           chainId: eip712.chainId,
-          verifyingContract: contractAddress,
+          verifyingContract: tokenContract,
         },
     {
       TransferWithAuthorization: [
@@ -297,7 +297,7 @@ function performGaslessTransfer(options: {
       const signature = response.result as string;
 
       setSending(true);
-      log("Transfer authorization signed, submitting to gas relayer...");
+      log("Transfer authorization signed, submitting to a gas relayer...");
 
       submitAuthorization({
         type: "transfer",

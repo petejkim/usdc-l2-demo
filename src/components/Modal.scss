@@ -28,5 +28,22 @@
     margin: 32px;
     height: auto;
     box-shadow: 0 0 16px $colorDark3;
+
+    &-contents {
+      text-align: center;
+      padding: 16px;
+
+      p {
+        line-height: 1.4;
+
+        &:first-of-type {
+          margin-top: 0;
+        }
+      }
+
+      .Button {
+        margin: 0 4px;
+      }
+    }
   }
 }

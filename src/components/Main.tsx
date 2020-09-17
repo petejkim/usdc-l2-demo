@@ -21,6 +21,7 @@ import { ClaimWithdrawal } from "./ClaimWithdrawal";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
 import { Deposit } from "./Deposit";
+import { L1Notice } from "./L1Notice";
 import { LastCheckpoint } from "./LastCheckpoint";
 import { Logs } from "./Logs";
 import "./Main.scss";
@@ -119,9 +120,15 @@ export function Main(): JSX.Element {
         </Box>
       </Flex>
 
-      <Box marginX={24}>
+      <Box marginX={24} marginY={12}>
         <TabBar selected={activeLayer} onSelect={selectLayer} />
       </Box>
+
+      {activeLayer === 1 && (
+        <Box marginX={24} marginY={12}>
+          <L1Notice />
+        </Box>
+      )}
 
       <Flex
         className="Main-mid-panels"
@@ -139,11 +146,11 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="USDC Balance">
+              <Panel title="L1 USDC Balance">
                 <TokenBalance
                   web3={web3}
                   userAddress={userAddress}
-                  contractAddress={L1_TOKEN_CONTRACT}
+                  tokenContract={L1_TOKEN_CONTRACT}
                   decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L1_REFRESH_INTERVAL}
                   initialBalance={balanceL1}
@@ -156,7 +163,7 @@ export function Main(): JSX.Element {
                 <TransferToken
                   signerWeb3={web3}
                   userAddress={userAddress}
-                  contractAddress={L1_TOKEN_CONTRACT}
+                  tokenContract={L1_TOKEN_CONTRACT}
                   balance={balanceL1}
                   decimalPlaces={DECIMAL_PLACES}
                   explorerUrl={L1_EXPLORER_URL}
@@ -186,11 +193,11 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="USDC Balance">
+              <Panel title="L2 USDC Balance">
                 <TokenBalance
                   web3={web3L2}
                   userAddress={userAddress}
-                  contractAddress={L2_TOKEN_CONTRACT}
+                  tokenContract={L2_TOKEN_CONTRACT}
                   decimalPlaces={DECIMAL_PLACES}
                   refreshInterval={L2_REFRESH_INTERVAL}
                   initialBalance={balanceL2}
@@ -199,11 +206,11 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Transfer USDC">
+              <Panel title="Transfer USDC Gaslessly">
                 <TransferToken
                   signerWeb3={web3}
                   userAddress={userAddress}
-                  contractAddress={L2_TOKEN_CONTRACT}
+                  tokenContract={L2_TOKEN_CONTRACT}
                   balance={balanceL2}
                   decimalPlaces={DECIMAL_PLACES}
                   gasAbstraction={L2_GAS_ABSTRACTION}
@@ -216,7 +223,7 @@ export function Main(): JSX.Element {
                 <Withdraw
                   signerWeb3={web3}
                   userAddress={userAddress}
-                  contractAddress={L2_TOKEN_CONTRACT}
+                  tokenContract={L2_TOKEN_CONTRACT}
                   balance={balanceL2}
                   decimalPlaces={DECIMAL_PLACES}
                   gasAbstraction={L2_GAS_ABSTRACTION}
@@ -256,7 +263,7 @@ export function Main(): JSX.Element {
                 />
               </Panel>
             ) : (
-              <Panel title="Cliché Visualization">
+              <Panel className="Main-visualization" title="Blockchain Magic">
                 <ClicheVisualization />
               </Panel>
             )}

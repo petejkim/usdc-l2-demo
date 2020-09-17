@@ -56,11 +56,18 @@ export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
 
   return (
     <Modal className="RequireWeb3" title="Be Advised">
-      <img src={metaMaskLogo} alt="" />
+      <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
+        <img src={metaMaskLogo} alt="" />
+      </a>
 
       <p>
-        To run this demo, please use a Web3-enabled browser connected to the
+        To run this demo, please use a Web3-enabled browser, connected to the
         Görli (Goerli) Test Network.
+      </p>
+
+      <p>
+        The USDC used in this demo is on the test network and do not have real
+        monetary value.
       </p>
 
       <Button onClick={connect}>Connect</Button>

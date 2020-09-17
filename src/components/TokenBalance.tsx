@@ -8,7 +8,7 @@ const BALANCE_OF_SELECTOR = "0x70a08231";
 export interface TokenBalanceProps {
   web3: Web3 | null;
   userAddress: string;
-  contractAddress: string;
+  tokenContract: string;
   decimalPlaces: number;
   refreshInterval: number;
   initialBalance: BN | null;
@@ -19,7 +19,7 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
   const {
     web3,
     userAddress,
-    contractAddress,
+    tokenContract,
     decimalPlaces,
     refreshInterval,
     initialBalance,
@@ -47,7 +47,7 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
         .call(
           {
             from: userAddress,
-            to: contractAddress,
+            to: tokenContract,
             data,
           },
           "latest"
@@ -72,7 +72,7 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
   }, [
     web3,
     userAddress,
-    contractAddress,
+    tokenContract,
     decimalPlaces,
     refreshInterval,
     onChange,

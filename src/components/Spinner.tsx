@@ -1,7 +1,20 @@
+import clsx from "clsx";
 import React from "react";
 import spinner from "../images/spinner.svg";
 import "./Spinner.scss";
 
-export function Spinner(): JSX.Element {
-  return <img className="Spinner" src={spinner} alt="" />;
+export interface SpinnerProps {
+  small?: boolean;
+}
+
+export function Spinner(props: SpinnerProps): JSX.Element {
+  const { small } = props;
+
+  return (
+    <img
+      className={clsx("Spinner", small && "Spinner-small")}
+      src={spinner}
+      alt=""
+    />
+  );
 }

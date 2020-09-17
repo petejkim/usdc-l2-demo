@@ -21,9 +21,6 @@
   }
 
   &-modal .Panel-contents {
-    text-align: center;
-    padding: 16px;
-
     .Withdraw-step {
       display: inline-block;
       width: 24px;
@@ -34,18 +31,6 @@
       color: $bgColor;
       font-weight: bold;
       box-shadow: 0 0 16px $colorDark2;
-    }
-
-    p {
-      line-height: 1.4;
-
-      &:first-of-type {
-        margin-top: 0;
-      }
-    }
-
-    .Button {
-      margin: 0 4px;
     }
   }
 }

@@ -19,7 +19,7 @@ import "./Withdraw.scss";
 export interface WithdrawProps {
   signerWeb3: Web3 | null;
   userAddress: string;
-  contractAddress: string;
+  tokenContract: string;
   balance: BN | null;
   decimalPlaces: number;
   gasAbstraction: {
@@ -33,7 +33,7 @@ export function Withdraw(props: WithdrawProps): JSX.Element {
   const {
     signerWeb3,
     userAddress,
-    contractAddress,
+    tokenContract,
     balance,
     decimalPlaces,
     gasAbstraction,
@@ -68,7 +68,7 @@ export function Withdraw(props: WithdrawProps): JSX.Element {
       signerWeb3,
       owner: userAddress,
       amount: parsedAmount,
-      contractAddress,
+      tokenContract,
       gasRelayUrl: gasAbstraction.relayUrl,
       eip712: gasAbstraction.eip712,
       explorerUrl,
@@ -78,7 +78,7 @@ export function Withdraw(props: WithdrawProps): JSX.Element {
   }, [
     signerWeb3,
     userAddress,
-    contractAddress,
+    tokenContract,
     gasAbstraction.eip712,
     gasAbstraction.relayUrl,
     explorerUrl,
@@ -141,7 +141,7 @@ function performBurn(options: {
   signerWeb3: Web3;
   owner: string;
   amount: BN;
-  contractAddress: string;
+  tokenContract: string;
   gasRelayUrl: string;
   eip712: EIP712Options;
   explorerUrl: string;
@@ -152,7 +152,7 @@ function performBurn(options: {
     signerWeb3,
     owner,
     amount,
-    contractAddress,
+    tokenContract,
     gasRelayUrl,
     eip712,
     explorerUrl,
@@ -161,7 +161,7 @@ function performBurn(options: {
   } = options;
 
   setSigning(true);
-  log("Awaiting signature for burn authorization...");
+  log("Requesting your signature to authorize a gasless burn...");
 
   const validAfter = UINT256_MIN;
   const validBefore = UINT256_MAX;
@@ -171,7 +171,7 @@ function performBurn(options: {
     {
       name: eip712.name,
       version: eip712.version,
-      verifyingContract: contractAddress,
+      verifyingContract: tokenContract,
       salt: eip712.chainId,
     },
     {
