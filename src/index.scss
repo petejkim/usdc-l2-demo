@@ -21,7 +21,7 @@ body,
 }
 
 a {
-  color: $colorLight1;
+  color: $color1Light1;
   text-decoration: none;
 }
 
@@ -37,5 +37,16 @@ code {
   margin: 2px;
   border-radius: 4px;
   border: 1px solid $bgColor;
-  background: $colorDark2;
+  background: $color1Dark2;
+}
+
+.alt-color {
+  a {
+    color: $color2Light1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border-color: $bgColor;
+    background-color: $color2Dark2;
+  }
 }

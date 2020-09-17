@@ -1,12 +1,18 @@
 $sans: Barlow, sans-serif;
 $monospace: "Nova Mono", monospace;
 
-$bgColor: rgb(5, 8, 13);
-$color1: rgb(156, 210, 220);
-$colorDark1: darken($color1, 10%);
-$colorDark2: darken($color1, 20%);
-$colorDark3: darken($color1, 40%);
-$colorLight1: lighten($color1, 5%);
-$colorLight2: lighten($color1, 20%);
+$bgColor: #05080d;
 
-$color2: rgb(226, 126, 47);
+$color1: #9cd2dc;
+$color1Dark1: darken($color1, 10%);
+$color1Dark2: darken($color1, 20%);
+$color1Dark3: darken($color1, 40%);
+$color1Light1: lighten($color1, 5%);
+$color1Light2: lighten($color1, 20%);
+
+$color2: #ff9d0f;
+$color2Dark1: darken($color2, 10%);
+$color2Dark2: darken($color2, 12%);
+$color2Dark3: darken($color2, 25%);
+$color2Light1: lighten($color2, 5%);
+$color2Light2: lighten($color2, 20%);

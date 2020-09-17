@@ -77,6 +77,11 @@ export function Main(): JSX.Element {
 
   const selectLayer = useCallback((tabId: TabId) => {
     setActiveLayer(tabId);
+    if (tabId === 1) {
+      document.body.classList?.add("alt-color");
+    } else {
+      document.body.classList?.remove("alt-color");
+    }
   }, []);
 
   const balanceL1Change = useCallback((balance: BN) => {

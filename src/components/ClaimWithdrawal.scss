@@ -23,9 +23,9 @@
     font-size: 13px;
     font-weight: bold;
     letter-spacing: 0.5px;
-    color: $colorLight2;
+    color: $color1Light2;
     padding-bottom: 8px;
-    border-bottom: 1px solid $colorDark3;
+    border-bottom: 1px solid $color1Dark3;
   }
 
   .Withdrawal {
@@ -55,5 +55,12 @@
       margin-left: 0;
       margin-right: 6px;
     }
+  }
+}
+
+.alt-color .ClaimWithdrawal {
+  th {
+    color: $color2Light2;
+    border-bottom-color: $color2Dark3;
   }
 }

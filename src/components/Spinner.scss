@@ -4,8 +4,22 @@
   height: 24px;
   vertical-align: middle;
 
+  &-alt {
+    display: none;
+  }
+
   &-small {
     width: 18px;
     height: 18px;
+  }
+}
+
+.alt-color {
+  .Spinner {
+    display: none;
+
+    &-alt {
+      display: inline-block;
+    }
   }
 }

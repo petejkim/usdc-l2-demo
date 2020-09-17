@@ -24,15 +24,28 @@
   }
 
   &:focus {
-    box-shadow: 0 0 5px $colorDark1;
+    box-shadow: 0 0 5px $color1Dark1;
   }
 
   &:active {
-    background-color: $colorDark2;
+    background-color: $color1Dark2;
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: default;
+  }
+}
+
+.alt-color .Button {
+  background-color: $color2;
+  color: $bgColor;
+
+  &:focus {
+    box-shadow: 0 0 5px $color2Dark1;
+  }
+
+  &:active {
+    background-color: $color2Dark2;
   }
 }

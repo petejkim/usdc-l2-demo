@@ -1,14 +1,14 @@
 @import "../variables";
 
 .Panel {
-  border: 2px solid $colorDark1;
+  border: 2px solid $color1Dark1;
   border-radius: 2px;
   padding: 4px;
   color: $color1;
   background-color: $bgColor;
 
   &-title {
-    border: 1px solid $colorDark3;
+    border: 1px solid $color1Dark3;
     border-bottom: none;
     border-top-left-radius: 1px;
     border-top-right-radius: 1px;
@@ -17,14 +17,29 @@
     font-weight: bold;
     letter-spacing: 0.5px;
     padding: 8px;
-    color: $colorLight2;
+    color: $color1Light2;
     white-space: nowrap;
   }
 
   &-contents {
     border-bottom-left-radius: 1px;
     border-bottom-right-radius: 1px;
-    border: 1px solid $colorDark3;
+    border: 1px solid $color1Dark3;
     padding: 8px;
+  }
+}
+
+.alt-color .Panel {
+  border-color: $color2Dark1;
+  color: $color2;
+  background-color: $bgColor;
+
+  &-title {
+    border-color: $color2Dark3;
+    color: $color2Light2;
+  }
+
+  &-contents {
+    border-color: $color2Dark3;
   }
 }

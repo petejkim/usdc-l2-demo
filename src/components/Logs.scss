@@ -4,6 +4,10 @@
   padding: 8px;
   line-height: 1.4;
 
+  a {
+    color: $color1;
+  }
+
   @media only screen and (min-width: 471px) {
     width: 100%;
     height: 100%;
@@ -20,7 +24,23 @@
   &-created-at {
     font-family: $monospace;
     font-size: 15px;
-    color: $colorDark2;
+    color: $color1Dark2;
     vertical-align: center;
+  }
+}
+
+.alt-color .Logs {
+  &-entry {
+    &-error {
+      color: $color1;
+    }
+  }
+
+  &-created-at {
+    color: $color2Dark2;
+  }
+
+  a {
+    color: $color2;
   }
 }

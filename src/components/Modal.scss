@@ -27,7 +27,7 @@
     max-width: 500px;
     margin: 32px;
     height: auto;
-    box-shadow: 0 0 16px $colorDark3;
+    box-shadow: 0 0 16px $color1Dark3;
 
     &-contents {
       text-align: center;
@@ -45,5 +45,11 @@
         margin: 0 4px;
       }
     }
+  }
+}
+
+.alt-color .Modal {
+  .Panel {
+    box-shadow: 0 0 16px $color2Dark3;
   }
 }

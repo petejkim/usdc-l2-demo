@@ -3,7 +3,7 @@
 .TextField {
   appearance: none;
   border: none;
-  border-bottom: 1px solid $colorDark3;
+  border-bottom: 1px solid $color1Dark3;
   outline: none;
   background-color: $bgColor;
   color: $color1;
@@ -12,11 +12,25 @@
   font-family: $monospace;
 
   &:focus {
-    border-color: $colorDark1;
+    border-color: $color1Dark1;
   }
 
   &::placeholder {
     font-family: $sans;
-    color: $colorDark2;
+    color: $color1Dark2;
+  }
+}
+
+.alt-color .TextField {
+  border-bottom-color: $color2Dark3;
+  color: $color2;
+
+  &:focus {
+    border-color: $color2Dark1;
+  }
+
+  &::placeholder {
+    font-family: $sans;
+    color: $color2Dark2;
   }
 }

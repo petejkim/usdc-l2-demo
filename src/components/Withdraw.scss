@@ -30,7 +30,16 @@
       background-color: $color1;
       color: $bgColor;
       font-weight: bold;
-      box-shadow: 0 0 16px $colorDark2;
+      box-shadow: 0 0 16px $color1Dark2;
+    }
+  }
+}
+
+.alt-color .Withdraw {
+  &-modal .Panel-contents {
+    .Withdraw-step {
+      background-color: $color2;
+      box-shadow: 0 0 16px $color2Dark2;
     }
   }
 }

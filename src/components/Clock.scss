@@ -7,8 +7,8 @@
   &-time {
     font-family: $monospace;
     font-size: 40px;
-    color: $colorLight2;
-    text-shadow: 0 0 16px $colorDark2;
+    color: $color1Light2;
+    text-shadow: 0 0 16px $color1Dark2;
   }
 
   &-nosleep {
@@ -16,5 +16,14 @@
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 0.5px;
+  }
+}
+
+.alt-color .Clock {
+  color: $color2;
+
+  &-time {
+    color: $color2Light2;
+    text-shadow: 0 0 16px $color2Dark2;
   }
 }
