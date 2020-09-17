@@ -13,6 +13,7 @@ declare global {
       request?: (args: { method: string; params?: any[] }) => Promise<any>;
       autoRefreshOnNetworkChange?: boolean;
       networkVersion?: string;
+      on?: (evt: string, callback: () => void) => void;
     };
   }
 }

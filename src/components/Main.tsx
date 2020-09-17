@@ -65,6 +65,10 @@ export function Main(): JSX.Element {
       if (address) {
         setUserAddress(address);
         setWeb3(new Web3(ethereum));
+
+        window?.ethereum?.on?.("accountsChanged", () => {
+          window.location.reload();
+        });
       }
     },
     []
