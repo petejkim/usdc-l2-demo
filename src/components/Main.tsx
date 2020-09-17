@@ -20,6 +20,7 @@ import { BlockHeight } from "./BlockHeight";
 import { ClaimWithdrawal } from "./ClaimWithdrawal";
 import { ClicheVisualization } from "./ClicheVisualization";
 import { Clock } from "./Clock";
+import { Deposit } from "./Deposit";
 import { LastCheckpoint } from "./LastCheckpoint";
 import { Logs } from "./Logs";
 import "./Main.scss";
@@ -163,7 +164,17 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Deposit USDC to Layer 2" />
+              <Panel title="Deposit USDC to Layer 2">
+                <Deposit
+                  web3={web3}
+                  userAddress={userAddress}
+                  tokenContract={L1_TOKEN_CONTRACT}
+                  posRootChainManager={L1_POS_ROOT_CHAIN_MANAGER_CONTRACT}
+                  balance={balanceL1}
+                  decimalPlaces={DECIMAL_PLACES}
+                  explorerUrl={L1_EXPLORER_URL}
+                />
+              </Panel>
             </Box>
           </Flex>
         ) : (

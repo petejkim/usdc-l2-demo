@@ -44,6 +44,10 @@ export function bnFromDecimalString(
   return new BN(whole + fractional, 10);
 }
 
+export function bnFromHexString(hex: string): BN {
+  return new BN(strip0x(hex), 16);
+}
+
 export function formatTime(date: Date): string {
   const [h, m, s] = [
     date.getHours(),
