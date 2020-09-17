@@ -51,7 +51,7 @@ export async function submitAuthorization(params: {
     "Authorization submitted to gas relayer, awaiting transaction submission..."
   );
 
-  const txHash = await retry(
+  const txHash: string = await retry(
     async () => {
       const response = await fetch(
         `${gasRelayUrl}/authorizations/${authorizationId}`,
@@ -77,6 +77,10 @@ export async function submitAuthorization(params: {
     },
     { interval: 500 }
   );
+
+  if (typeof txHash !== "string") {
+    throw new Error("Failed to get transaction hash.");
+  }
 
   log(`Transaction submitted (${txHash}), awaiting confirmation...`, {
     url: explorerTxHashUrl(explorerUrl, txHash),
@@ -105,6 +109,10 @@ export async function submitAuthorization(params: {
     },
     { interval: 500 }
   );
+
+  if (typeof blockNumber !== "number") {
+    throw new Error("Failed to get confirmation block number.");
+  }
 
   return { txHash, blockNumber };
 }
