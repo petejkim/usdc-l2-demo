@@ -4,6 +4,7 @@ import metaMaskLogo from "../images/metamask.svg";
 import { JSONRPCRequest, JSONRPCResponse } from "../types/Provider";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
+import { Link } from "./Link";
 import { Modal } from "./Modal";
 import "./RequireWeb3.scss";
 
@@ -40,24 +41,20 @@ export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
   }, [onConnect, setHint]);
 
   return (
-    <Modal className="RequireWeb3" title="Be Advised">
+    <Modal className="RequireWeb3" title="BE ADVISED">
       <img src={metaMaskLogo} alt="" />
 
       <p>
         To run this demo, please use a Web3-enabled browser, such as{" "}
-        <a
-          href="https://metamask.io/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Link url="https://metamask.io/" blank>
           MetaMask,{" "}
-        </a>
+        </Link>
         connected to the Görli (Goerli) Test Network.
       </p>
 
       <p>
-        The USDC used in this demo is on the test network and do not have real
-        monetary value.
+        The USDC v2 smart contract used in this demo is on the test network and
+        its tokens do not have real monetary value.
       </p>
 
       <Button onClick={clickConnect}>Connect</Button>

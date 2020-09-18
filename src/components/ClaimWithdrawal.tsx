@@ -21,6 +21,7 @@ import {
 } from "../util/withdrawal";
 import { Button } from "./Button";
 import "./ClaimWithdrawal.scss";
+import { Link } from "./Link";
 import { Spinner } from "./Spinner";
 
 const EXIT_SELECTOR = "0x3805550f";
@@ -164,13 +165,9 @@ export function Withdrawal(props: WithdrawalProps): JSX.Element {
   return (
     <tr className="Withdrawal">
       <td className="Withdrawal-tx-hash">
-        <a
-          href={explorerTxHashUrl(explorerUrlL2, txHash)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <Link url={explorerTxHashUrl(explorerUrlL2, txHash)} blank>
           <code title={txHash}>{abbreviateHex(txHash)}</code>
-        </a>
+        </Link>
       </td>
       <td className="Withdrawal-block">
         <code>{burnTx.blockNumber}</code>

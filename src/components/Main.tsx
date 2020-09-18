@@ -108,17 +108,17 @@ export function Main(): JSX.Element {
         marginY={0}
       >
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="Wallet Address">
+          <Panel title="WALLET ADDRESS">
             <WalletAddress address={userAddress} />
           </Panel>
         </Box>
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="L1 / Görli Block Height">
+          <Panel title="L1 / GÖRLI BLOCK HEIGHT">
             <BlockHeight web3={web3} refreshInterval={L1_REFRESH_INTERVAL} />
           </Panel>
         </Box>
         <Box flex={1} margin={12} minWidth="auto">
-          <Panel title="L2 / Mumbai Block Height">
+          <Panel title="L2 / MUMBAI BLOCK HEIGHT">
             <BlockHeight web3={web3L2} refreshInterval={L2_REFRESH_INTERVAL} />
           </Panel>
         </Box>
@@ -154,7 +154,7 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="L1 USDC Balance">
+              <Panel title="USDC BALANCE">
                 <TokenBalance
                   web3={web3}
                   signerWeb3={null}
@@ -170,7 +170,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Transfer USDC">
+              <Panel title="TRANSFER USDC">
                 <TransferToken
                   signerWeb3={web3}
                   userAddress={userAddress}
@@ -182,7 +182,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Deposit USDC to Layer 2">
+              <Panel title="DEPOSIT TO LAYER 2">
                 <Deposit
                   web3={web3}
                   userAddress={userAddress}
@@ -205,7 +205,7 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="L2 USDC Balance">
+              <Panel title="mUSDC BALANCE">
                 <TokenBalance
                   web3={web3L2}
                   signerWeb3={web3}
@@ -222,7 +222,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Transfer USDC Gaslessly">
+              <Panel title="TRANSFER mUSDC GASLESSLY">
                 <TransferToken
                   signerWeb3={web3}
                   userAddress={userAddress}
@@ -235,7 +235,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="Withdraw USDC to Layer 1">
+              <Panel title="WITHDRAW TO LAYER 1">
                 <Withdraw
                   signerWeb3={web3}
                   userAddress={userAddress}
@@ -252,7 +252,7 @@ export function Main(): JSX.Element {
         <Flex flex={1} marginX={12} flexDirection="column" minWidth="auto">
           {activeLayer === 1 && (
             <Box flexShrink={0} marginY={12} minWidth="auto">
-              <Panel title="Last Checkpoint">
+              <Panel title="LAST CHECKPOINT">
                 <LastCheckpoint
                   web3={web3}
                   rootChain={L1_ROOT_CHAIN_CONTRACT}
@@ -265,7 +265,7 @@ export function Main(): JSX.Element {
           )}
           <Box className="Main-mid-right" flexGrow={1} marginY={12}>
             {activeLayer === 1 ? (
-              <Panel title="Claim Withdrawals">
+              <Panel title="CLAIM WITHDRAWALS">
                 <ClaimWithdrawal
                   web3={web3}
                   web3L2={web3L2}
@@ -279,7 +279,10 @@ export function Main(): JSX.Element {
                 />
               </Panel>
             ) : (
-              <Panel className="Main-visualization" title="Blockchain Magic">
+              <Panel
+                className="Main-visualization"
+                title="CLICHÉ VISUALIZATION"
+              >
                 <ClicheVisualization />
               </Panel>
             )}
@@ -294,7 +297,7 @@ export function Main(): JSX.Element {
         marginX={24}
         marginY={12}
       >
-        <Panel title="Logs">
+        <Panel title="LOGS">
           <Logs />
         </Panel>
       </Box>

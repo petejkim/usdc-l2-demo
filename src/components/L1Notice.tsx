@@ -5,7 +5,7 @@ import { Panel } from "./Panel";
 
 export function L1Notice(): JSX.Element {
   return (
-    <Panel className="L1Notice" title="Görli Test Ether Required ">
+    <Panel className="L1Notice" title="GÖRLI TESTNET ETHER REQUIRED">
       <p>
         Gasless transactions are not implemented for Layer 1 (Görli Testnet) in
         this demo.

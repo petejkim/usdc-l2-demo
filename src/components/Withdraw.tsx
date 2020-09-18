@@ -116,7 +116,7 @@ export function Withdraw(props: WithdrawProps): JSX.Element {
       </div>
 
       {showModal && (
-        <Modal className="Withdraw-modal" title="Be Advised">
+        <Modal className="Withdraw-modal" title="BE ADVISED">
           <p>Withdrawing USDC from L2 to L1 is a two-step process.</p>
           <span className="Withdraw-step">1</span>
           <p>In L2, the USDC tokens you'd like to withdraw are burned.</p>

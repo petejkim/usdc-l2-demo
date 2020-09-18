@@ -132,7 +132,7 @@ export function Deposit(props: DepositProps): JSX.Element {
       </div>
 
       {showModal && (
-        <Modal className="Deposit-modal" title="Be Advised">
+        <Modal className="Deposit-modal" title="BE ADVISED">
           <p>
             After your deposit transaction is confirmed in L1, your token
             balance in L2 will be updated in about 5 to 8 minutes, once the

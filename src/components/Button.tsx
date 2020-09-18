@@ -1,6 +1,7 @@
 import clsx from "clsx";
 import React, { useCallback } from "react";
 import "./Button.scss";
+import { Link } from "./Link";
 
 export interface ButtonProps {
   children?: React.ReactNode;
@@ -25,15 +26,9 @@ export function Button(props: ButtonProps): JSX.Element {
   const className = clsx("Button", small && "Button-small");
 
   return href && !disabled ? (
-    <a
-      className={className}
-      href={href}
-      title={title}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <Link className={className} url={href} title={title} blank>
       {children}
-    </a>
+    </Link>
   ) : (
     <button
       className={className}

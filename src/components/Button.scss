@@ -15,6 +15,7 @@
   letter-spacing: 0.5px;
   transition: 0.1s background-color, 0.1s box-shadow;
   cursor: pointer;
+  user-select: none;
 
   &-small {
     height: 24px;

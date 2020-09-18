@@ -1,6 +1,8 @@
 @import "../variables";
 
 .TabBar {
+  user-select: none;
+
   ul {
     margin: 0;
     padding: 0;

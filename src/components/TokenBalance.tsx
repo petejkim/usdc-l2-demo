@@ -178,7 +178,7 @@ export function TokenBalance(props: TokenBalanceProps): JSX.Element {
       </div>
 
       {showModal && (
-        <Modal className="TokenBalance-cantClaim" title="Sincere Apologies">
+        <Modal className="TokenBalance-cantClaim" title="SINCERE APOLOGIES">
           <p>
             You are trying to obtain tokens again again too quickly. Please wait
             an hour between every claim.

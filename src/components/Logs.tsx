@@ -3,6 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef } from "react";
 import * as logger from "../util/logger";
 import { formatTime } from "../util/types";
 import { useRerender } from "../util/useRerender";
+import { Link } from "./Link";
 import "./Logs.scss";
 
 export function Logs(): JSX.Element {
@@ -39,9 +40,9 @@ function LogEntry(props: { entry: logger.LogEntry }): JSX.Element {
     <div className={clsx("Logs-entry", error && "Logs-entry-error")}>
       <span className="Logs-created-at">[{formatTime(createdAt)}]</span>{" "}
       {url ? (
-        <a href={url} target="_blank" rel="noopener noreferrer">
+        <Link url={url} blank>
           {text}
-        </a>
+        </Link>
       ) : (
         text
       )}
