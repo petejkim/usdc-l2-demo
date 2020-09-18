@@ -5,7 +5,7 @@ export interface JSONRPCRequest {
   params: any[];
 }
 
-export interface JSONRPCResponse {
+export interface JSONRPCResponse<T = any> {
   jsonrpc: "2.0";
   id: number | string;
   error?: {
@@ -13,7 +13,7 @@ export interface JSONRPCResponse {
     message?: string;
     data?: any;
   };
-  result?: any;
+  result?: T;
 }
 
 export interface Provider {

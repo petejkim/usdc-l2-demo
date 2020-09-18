@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import Web3 from "web3";
 import metaMaskLogo from "../images/metamask.svg";
+import { JSONRPCRequest, JSONRPCResponse } from "../types/Provider";
 import { Button } from "./Button";
 import { HintBubble } from "./HintBubble";
 import { Modal } from "./Modal";
@@ -9,10 +10,13 @@ import "./RequireWeb3.scss";
 declare global {
   interface Window {
     ethereum?: {
-      enable?: () => Promise<string[]>;
-      request?: (args: { method: string; params?: any[] }) => Promise<any>;
-      autoRefreshOnNetworkChange?: boolean;
-      networkVersion?: string;
+      enable: () => Promise<string[]>;
+      sendAsync: (
+        req: JSONRPCRequest,
+        callback: (err: Error, res: JSONRPCResponse) => void
+      ) => void;
+      request: (args: { method: string; params?: any[] }) => Promise<any>;
+      autoRefreshOnNetworkChange: boolean;
       on?: (evt: string, callback: () => void) => void;
     };
   }
@@ -23,47 +27,32 @@ if (typeof window.ethereum?.autoRefreshOnNetworkChange === "boolean") {
 }
 
 export interface RequireWeb3Props {
-  onConnect?: (address: string, provider: any) => void;
+  onConnect: (address: string, provider: any) => void;
 }
 
 export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
   const { onConnect } = props;
 
-  const [chainId, setChainId] = useState<number | undefined>(undefined);
+  const [hint, setHint] = useState<string>("");
 
-  const connect = useCallback(() => {
-    let accountsPromise: Promise<string[]>;
-
-    if (typeof window?.ethereum?.request === "function") {
-      accountsPromise = window.ethereum.request({
-        method: "eth_requestAccounts",
-      });
-    } else if (typeof window?.ethereum?.enable === "function") {
-      accountsPromise = window.ethereum.enable();
-    } else {
-      return;
-    }
-
-    void accountsPromise.then((accounts): void => {
-      const netVer = Number(window.ethereum?.networkVersion);
-      setChainId(netVer);
-
-      if (netVer === 5) {
-        const address = Web3.utils.toChecksumAddress(accounts[0]);
-        onConnect?.(address, window?.ethereum);
-      }
-    });
-  }, [onConnect]);
+  const clickConnect = useCallback(() => {
+    void connect(onConnect, setHint);
+  }, [onConnect, setHint]);
 
   return (
     <Modal className="RequireWeb3" title="Be Advised">
-      <a href="https://metamask.io/" target="_blank" rel="noopener noreferrer">
-        <img src={metaMaskLogo} alt="" />
-      </a>
+      <img src={metaMaskLogo} alt="" />
 
       <p>
-        To run this demo, please use a Web3-enabled browser, connected to the
-        Görli (Goerli) Test Network.
+        To run this demo, please use a Web3-enabled browser, such as{" "}
+        <a
+          href="https://metamask.io/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          MetaMask,{" "}
+        </a>
+        connected to the Görli (Goerli) Test Network.
       </p>
 
       <p>
@@ -71,11 +60,46 @@ export function RequireWeb3(props: RequireWeb3Props): JSX.Element {
         monetary value.
       </p>
 
-      <Button onClick={connect}>Connect</Button>
+      <Button onClick={clickConnect}>Connect</Button>
 
-      {chainId != null && chainId !== 5 && (
-        <HintBubble>Please switch to Görli Testnet and try again.</HintBubble>
-      )}
+      {hint && <HintBubble>{hint}</HintBubble>}
     </Modal>
+  );
+}
+
+async function connect(
+  onConnect: (address: string, provider: any) => void,
+  setHint: (message: string) => void
+): Promise<void> {
+  const { ethereum } = window;
+  if (!ethereum) {
+    setHint("You aren't running a Web3-enabled browser.");
+    return;
+  }
+
+  const accounts = await ethereum.enable();
+
+  ethereum.sendAsync(
+    {
+      method: "net_version",
+      params: [],
+      jsonrpc: "2.0",
+      id: 1,
+    },
+    (err, resp) => {
+      if (err) {
+        setHint(err.message);
+        return;
+      }
+
+      const netVersion = Number(resp?.result);
+
+      if (netVersion !== 5) {
+        setHint("Please switch to Görli Testnet and try again.");
+        return;
+      }
+
+      onConnect(Web3.utils.toChecksumAddress(accounts[0]), ethereum);
+    }
   );
 }
