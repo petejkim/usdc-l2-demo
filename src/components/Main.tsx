@@ -101,6 +101,7 @@ export function Main(): JSX.Element {
       <Flex
         flexDirection="row"
         flexWrap="wrap"
+        flexShrink={0}
         justifyContent="space-evenly"
         alignItems="center"
         marginX={12}
@@ -139,6 +140,7 @@ export function Main(): JSX.Element {
       <Flex
         className="Main-mid-panels"
         justifyContent="space-evenly"
+        flexShrink={0}
         flexWrap="wrap"
         marginX={12}
         marginY={0}
@@ -261,7 +263,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
           )}
-          <Box className="Main-withdrawals" flexGrow={1} marginY={12}>
+          <Box className="Main-mid-right" flexGrow={1} marginY={12}>
             {activeLayer === 1 ? (
               <Panel title="Claim Withdrawals">
                 <ClaimWithdrawal
@@ -285,13 +287,19 @@ export function Main(): JSX.Element {
         </Flex>
       </Flex>
 
-      <Box className="Main-logs" flex={1} marginX={24} marginY={12}>
+      <Box
+        className="Main-logs"
+        flex={1}
+        flexShrink={0}
+        marginX={24}
+        marginY={12}
+      >
         <Panel title="Logs">
           <Logs />
         </Panel>
       </Box>
 
-      <Box marginX={24}>
+      <Box flexShrink={0} marginX={24}>
         <Attribution />
       </Box>
 
