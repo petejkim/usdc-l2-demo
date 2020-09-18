@@ -2,7 +2,7 @@ import BN from "bn.js";
 import { ERC20_TRANSFER_EVENT_SIG, MaticPOSExit } from "matic-pos-exit";
 import Web3 from "web3";
 
-const LOCAL_STORAGE_BURN_KEY = "l2demo:burns";
+const LOCAL_STORAGE_BURN_KEY = "l2demo:burns:";
 
 export interface BurnTx {
   txHash: string;
@@ -10,20 +10,27 @@ export interface BurnTx {
   amount: BN;
 }
 
-export function addBurn(txHash: string, blockNumber: number, amount: BN): void {
-  const burns = loadBurnsFromLocalStorage();
+export type BurnStorage = Record<string, [number, string]>;
+
+export function addBurn(
+  address: string,
+  txHash: string,
+  blockNumber: number,
+  amount: BN
+): void {
+  const burns = loadBurnsFromLocalStorage(address);
   burns[txHash] = [blockNumber, amount.toString(10)];
-  localStorage.setItem(LOCAL_STORAGE_BURN_KEY, JSON.stringify(burns));
+  saveBurnsToLocalStorage(address, burns);
 }
 
-export function removeBurn(txHash: string): void {
-  const burns = loadBurnsFromLocalStorage();
+export function removeBurn(address: string, txHash: string): void {
+  const burns = loadBurnsFromLocalStorage(address);
   delete burns[txHash];
-  localStorage.setItem(LOCAL_STORAGE_BURN_KEY, JSON.stringify(burns));
+  saveBurnsToLocalStorage(address, burns);
 }
 
-export function loadBurns(): BurnTx[] {
-  const burns = loadBurnsFromLocalStorage();
+export function loadBurns(address: string): BurnTx[] {
+  const burns = loadBurnsFromLocalStorage(address);
   return Object.entries(burns).map(([txHash, [blockNumber, amount]]) => ({
     txHash,
     blockNumber,
@@ -31,8 +38,17 @@ export function loadBurns(): BurnTx[] {
   }));
 }
 
-function loadBurnsFromLocalStorage(): Record<string, [number, string]> {
-  return JSON.parse(localStorage.getItem(LOCAL_STORAGE_BURN_KEY) || "{}");
+function loadBurnsFromLocalStorage(address: string): BurnStorage {
+  return JSON.parse(
+    localStorage.getItem(LOCAL_STORAGE_BURN_KEY + address.toLowerCase()) || "{}"
+  );
+}
+
+function saveBurnsToLocalStorage(address: string, storage: BurnStorage): void {
+  localStorage.setItem(
+    LOCAL_STORAGE_BURN_KEY + address.toLowerCase(),
+    JSON.stringify(storage)
+  );
 }
 
 export async function getLastChildBlock(

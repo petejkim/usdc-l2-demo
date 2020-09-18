@@ -236,7 +236,7 @@ function performBurn(options: {
         explorerUrl,
       })
         .then(({ txHash, blockNumber }) => {
-          addBurn(txHash, blockNumber, amount);
+          addBurn(owner, txHash, blockNumber, amount);
           events.emit(BALANCE_SHOULD_UPDATE_EVENT);
           log(
             `Burn confirmed at ${blockNumber}. You can claim burned tokens in` +

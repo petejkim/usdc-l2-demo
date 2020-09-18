@@ -53,8 +53,8 @@ export function ClaimWithdrawal(props: ClaimWithdrawalProps): JSX.Element {
   const [burns, setBurns] = useState<BurnTx[]>([]);
 
   const reloadBurns = useCallback(() => {
-    setBurns(loadBurns());
-  }, []);
+    setBurns(loadBurns(userAddress));
+  }, [userAddress]);
 
   useEffect(() => {
     reloadBurns();
@@ -238,7 +238,7 @@ async function performExit(
     })
     .on("transactionHash", (claimTxHash) => {
       setState(WithdrawalState.CLAIMING);
-      removeBurn(burnTxHash);
+      removeBurn(userAddress, burnTxHash);
       log(`Transaction submitted (${claimTxHash}), awaiting confirmation...`, {
         url: explorerTxHashUrl(explorerUrl, claimTxHash),
       });
