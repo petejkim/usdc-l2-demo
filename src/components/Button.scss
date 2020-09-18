@@ -24,6 +24,10 @@
     padding: 0 8px;
   }
 
+  &:hover {
+    background-color: $color1Light1;
+  }
+
   &:focus {
     box-shadow: 0 0 5px $color1Dark1;
   }
@@ -41,6 +45,10 @@
 .alt-color .Button {
   background-color: $color2;
   color: $bgColor;
+
+  &:hover {
+    background-color: $color2Light1;
+  }
 
   &:focus {
     box-shadow: 0 0 5px $color2Dark1;

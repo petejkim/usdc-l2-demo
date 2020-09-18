@@ -16,6 +16,7 @@ import {
   L2_GAS_RELAY_URL,
   L2_JSON_RPC_URL,
   L2_TOKEN_CONTRACT,
+  SMILE_ADDRESS,
 } from "../config";
 import { Attribution } from "./Attribution";
 import { BlockHeight } from "./BlockHeight";
@@ -178,6 +179,7 @@ export function Main(): JSX.Element {
                   balance={balanceL1}
                   decimalPlaces={DECIMAL_PLACES}
                   explorerUrl={L1_EXPLORER_URL}
+                  smileAddress={SMILE_ADDRESS}
                 />
               </Panel>
             </Box>
@@ -231,6 +233,7 @@ export function Main(): JSX.Element {
                   decimalPlaces={DECIMAL_PLACES}
                   gasAbstraction={L2_GAS_ABSTRACTION}
                   explorerUrl={L2_EXPLORER_URL}
+                  smileAddress={SMILE_ADDRESS}
                 />
               </Panel>
             </Box>

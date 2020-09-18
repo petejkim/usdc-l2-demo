@@ -28,6 +28,7 @@ export interface TransferTokenProps {
     eip712: EIP712Options;
   };
   explorerUrl: string;
+  smileAddress: string;
 }
 
 export function TransferToken(props: TransferTokenProps): JSX.Element {
@@ -39,6 +40,7 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
     decimalPlaces,
     gasAbstraction,
     explorerUrl,
+    smileAddress,
   } = props;
 
   const [recipient, setRecipient] = useState<string>("");
@@ -49,6 +51,10 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
   const changeAmount = useCallback((v: string) => {
     setAmount(v.replace(/[^\d.]/g, "") || "");
   }, []);
+
+  const clickSmile = useCallback(() => {
+    setRecipient(smileAddress);
+  }, [smileAddress]);
 
   const parsedAmount = bnFromDecimalString(amount, decimalPlaces);
 
@@ -111,6 +117,14 @@ export function TransferToken(props: TransferTokenProps): JSX.Element {
           placeholder="Recipient address (0x1234...)"
           onChange={setRecipient}
         />
+        <button
+          className="TransferToken-smile"
+          title="Just put some address!"
+          onClick={clickSmile}
+        >
+          &#x263b;
+        </button>
+
         {recipient && !recipientValid && (
           <HintBubble>Address entered is invalid.</HintBubble>
         )}

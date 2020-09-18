@@ -19,6 +19,7 @@ export function TextField(props: TextFieldProps): JSX.Element {
 
   return (
     <input
+      type="text"
       className="TextField"
       value={value}
       placeholder={placeholder}

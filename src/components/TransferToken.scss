@@ -1,3 +1,5 @@
+@import "../variables";
+
 .TransferToken {
   &-recipient-field {
     position: relative;
@@ -5,6 +7,7 @@
 
     .TextField {
       width: 100%;
+      padding-right: 24px;
     }
   }
 
@@ -27,5 +30,47 @@
   .Spinner {
     margin-left: 8px;
     flex-shrink: 0;
+  }
+
+  &-smile {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0;
+    width: 24px;
+    text-align: right;
+    appearance: none;
+    border: none;
+    outline: none;
+    border-radius: none;
+    background-color: transparent;
+    font-size: 24px;
+    line-height: 32px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.1s color;
+    color: $color1;
+
+    &:hover {
+      color: $color1Light1;
+    }
+
+    &:active {
+      color: $color1Dark2;
+    }
+  }
+}
+
+.alt-color .TransferToken {
+  &-smile {
+    color: $color2;
+
+    &:hover {
+      color: $color2Light1;
+    }
+
+    &:active {
+      color: $color2Dark2;
+    }
   }
 }
