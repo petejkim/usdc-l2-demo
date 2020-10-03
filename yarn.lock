@@ -8033,8 +8033,10 @@ matchmediaquery@^0.3.0:
   dependencies:
     css-mediaquery "^0.1.2"
 
-"matic-pos-exit@file:../matic-pos-exit":
+matic-pos-exit@^1.0.0:
   version "1.0.0"
+  resolved "https://registry.yarnpkg.com/matic-pos-exit/-/matic-pos-exit-1.0.0.tgz#b174e637e1ce96f2258f72a16abc835f776b8d47"
+  integrity sha512-IpyWfC+euPNwb3gIRaKzS3f+vmx7nHKkKVRK3dialZh4U4BiTPS4WzF1WIhPwTJBaK0oF1Gd8DGrdunJv+SZ9A==
   dependencies:
     bluebird "^3.7.2"
     ethereumjs-block "2.2.0"
