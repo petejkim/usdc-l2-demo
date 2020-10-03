@@ -155,7 +155,7 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="USDC BALANCE">
+              <Panel title="L1 USDC BALANCE">
                 <TokenBalance
                   web3={web3}
                   signerWeb3={null}
@@ -207,7 +207,7 @@ export function Main(): JSX.Element {
             minWidth="auto"
           >
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="mUSDC BALANCE">
+              <Panel title="L2 USDC BALANCE">
                 <TokenBalance
                   web3={web3L2}
                   signerWeb3={web3}
@@ -224,7 +224,7 @@ export function Main(): JSX.Element {
               </Panel>
             </Box>
             <Box flex={1} marginY={12} minWidth="auto">
-              <Panel title="TRANSFER mUSDC GASLESSLY">
+              <Panel title="TRANSFER USDC GASLESSLY">
                 <TransferToken
                   signerWeb3={web3}
                   userAddress={userAddress}
